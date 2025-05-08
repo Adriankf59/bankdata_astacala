@@ -6,7 +6,7 @@ import { useState } from 'react';
 const activities = [
   {
     title: 'Rock Climbing',
-    image: '/rc.jpg',
+    image: '/rock-climbing.jpg',
     desc: 'Experience the thrill of climbing with breathtaking views from the top.',
     link: '/activities/rock-climbing',
     type: 'rock climbing',
