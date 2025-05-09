@@ -6,14 +6,24 @@ import Link from 'next/link';
 const activitiesData = {
   'rock-climbing': {
     title: 'Rock Climbing',
-    image: '/rc.jpg',
+    image: '/rock-climbing.jpg',
     description: "Explore the heights of Astacala's mountains with our Rock Climbing Division. Learn about safe climbing techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Climbing Techniques' },
       { icon: 'fas fa-tools', label: 'Equipment Essentials' },
       { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
     ],
-    // Table will be populated from API data
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Gunung Parang', region: 'Southern Range', accessibility: 'Moderate' },
+        { name: 'Citatah', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
   },
   caving: {
     title: 'Caving Division',
@@ -145,52 +155,22 @@ const activitiesData = {
   },
 };
 
-export default function ActivityDetail({ type, apiData }) {
+export default function ActivityDetail() {
   const router = useRouter();
-  
-  // Handle fallback
-  if (router.isFallback) {
-    return <div className="text-center py-20 bg-black text-white">Loading...</div>;
-  }
+  let { type } = router.query;
 
-  // If type is not valid, show error
   if (!type || !activitiesData[type]) {
     return <div className="text-center py-20 bg-black text-white">Activity not found.</div>;
   }
 
-  const activity = { ...activitiesData[type] };
-
-  // Create table data for rock climbing based on API data
-  if (type === 'rock-climbing' && apiData) {
-    const firstItem = apiData.data[0];
-    
-    // Create columns based on the first item keys
-    const columns = Object.keys(firstItem)
-      .filter(key => key !== 'id' && key !== 'no') // Exclude id and no
-      .map(key => {
-        // Map key to more user-friendly label
-        let label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        
-        // Special case for specific keys
-        if (key === 'nama_lokasi') label = 'Nama Lokasi';
-        if (key === 'titik_koordinat') label = 'Koordinat';
-        if (key === 'link_rop') label = 'ROP Link';
-        
-        return { key, label };
-      });
-    
-    activity.table = {
-      columns,
-      rows: apiData.data
-    };
-  }
+  const activity = activitiesData[type];
 
   return (
     <>
       <Header />
       <main className="bg-black min-h-screen">
-        {/* Main Card */}
-        <div className="max-w-7xl mx-auto w-full px-4 pt-6 pb-2">
+        {/* Card utama */}
+        <div className="max-w-5xl mx-auto w-full px-4 pt-6 pb-2">
           <div className="bg-gray-900 rounded-xl shadow flex flex-col md:flex-row p-6 gap-6 items-center mb-6 border border-gray-800">
             <img src={activity.image} alt={activity.title} className="w-48 h-36 object-cover rounded-lg" />
             <div>
@@ -199,7 +179,7 @@ export default function ActivityDetail({ type, apiData }) {
             </div>
           </div>
 
-          {/* Features */}
+          {/* Fitur-fitur */}
           <div className="bg-gray-900 rounded-xl shadow flex flex-col md:flex-row justify-between items-center p-6 mb-6 gap-6 border border-gray-800">
             {activity.features.map((f, idx) => (
               <div key={idx} className="flex flex-col items-center flex-1">
@@ -213,11 +193,10 @@ export default function ActivityDetail({ type, apiData }) {
             ))}
           </div>
 
-          {/* Location Table */}
-          <div className="bg-gray-900 rounded-xl shadow p-6 border border-gray-800">
-            <h2 className="text-lg md:text-xl font-bold mb-4 text-red-500">Lokasi Kegiatan</h2>
-            
-            {activity.table ? (
+          {/* Tabel Lokasi dinamis */}
+          {activity.table && (
+            <div className="bg-gray-900 rounded-xl shadow p-6 border border-gray-800">
+              <h2 className="text-lg md:text-xl font-bold mb-4 text-red-500">Lokasi Kegiatan</h2>
               <div className="overflow-x-auto">
                 <table className="table-auto w-full">
                   <thead>
@@ -229,29 +208,13 @@ export default function ActivityDetail({ type, apiData }) {
                   </thead>
                   <tbody>
                     {activity.table.rows.map((row, idx) => (
-                      <tr key={idx} className="border-b border-gray-700 last:border-b-0 hover:bg-gray-800">
+                      <tr key={idx} className="border-b border-gray-700 last:border-b-0">
                         {activity.table.columns.map((col) => (
                           <td key={col.key} className="py-2 px-4 text-gray-300">
-                            {col.key === 'link_rop' ? (
-                              <a 
-                                href={row[col.key]} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-red-500 underline font-semibold hover:text-red-400"
-                              >
-                                Link ROP
-                              </a>
-                            ) : col.key === 'titik_koordinat' ? (
-                              <a 
-                                href={`https://www.google.com/maps/search/?api=1&query=${row[col.key]}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 hover:underline"
-                              >
-                                {row[col.key] || 'N/A'}
-                              </a>
+                            {col.key === 'rop' ? (
+                              <a href={row[col.key]} target="_blank" rel="noopener noreferrer" className="text-red-500 underline font-semibold hover:text-red-400">Link ROP</a>
                             ) : (
-                              row[col.key] || 'N/A'
+                              row[col.key]
                             )}
                           </td>
                         ))}
@@ -260,10 +223,8 @@ export default function ActivityDetail({ type, apiData }) {
                   </tbody>
                 </table>
               </div>
-            ) : (
-              <p className="text-center py-4 text-gray-400">No location data available.</p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
@@ -274,51 +235,4 @@ export default function ActivityDetail({ type, apiData }) {
       `}</style>
     </>
   );
-}
-
-// This function gets called at build time
-export async function getStaticPaths() {
-  // Define the paths we want to pre-render
-  const paths = [
-    { params: { type: 'rock-climbing' } },
-    { params: { type: 'caving' } },
-    { params: { type: 'rafting' } },
-    { params: { type: 'diving' } },
-    { params: { type: 'conservation' } },
-    { params: { type: 'paralayang' } }
-  ];
-  
-  // We'll pre-render only these paths at build time
-  // { fallback: false } means other routes should 404
-  // { fallback: true } would enable SSR for paths not returned by getStaticPaths
-  return { paths, fallback: false };
-}
-
-// This function gets called at build time
-export async function getStaticProps({ params }) {
-  const { type } = params;
-  
-  // Fetch data based on type
-  let apiData = null;
-  
-  if (type === 'rock-climbing') {
-    try {
-      const res = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/rock_climbing');
-      apiData = await res.json();
-    } catch (error) {
-      console.error('Failed to fetch rock climbing data:', error);
-      // Continue with null data, the UI will handle it
-    }
-  }
-  
-  // Pass data to the page via props
-  return { 
-    props: { 
-      type,
-      apiData
-    },
-    // Re-generate the page at most once per 60 seconds
-    // if a request comes in
-    revalidate: 60, // In seconds
-  };
 }

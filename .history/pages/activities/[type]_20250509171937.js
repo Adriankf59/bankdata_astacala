@@ -6,7 +6,7 @@ import Link from 'next/link';
 const activitiesData = {
   'rock-climbing': {
     title: 'Rock Climbing',
-    image: '/rc.jpg',
+    image: '/rock-climbing.jpg',
     description: "Explore the heights of Astacala's mountains with our Rock Climbing Division. Learn about safe climbing techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Climbing Techniques' },
