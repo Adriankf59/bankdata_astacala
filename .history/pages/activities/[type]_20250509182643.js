@@ -347,7 +347,7 @@ export async function getStaticProps({ params }) {
       astacalaData = await astRes.json();
       
       // Fetch external caves data
-      const extRes = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caves?limit=-1');
+      const extRes = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caves');
       externalData = await extRes.json();
     } catch (error) {
       console.error('Failed to fetch caving data:', error);

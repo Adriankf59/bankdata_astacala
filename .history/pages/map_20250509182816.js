@@ -62,14 +62,6 @@ const parseCoordinates = (coordString) => {
       return null;
     }
     
-    // Check if coordinates are in the format "-6.826774033660179, 107.4439211531441"
-    if (coordString.includes(',')) {
-      const parts = coordString.split(',');
-      const latitude = parseFloat(parts[0].trim());
-      const longitude = parseFloat(parts[1].trim());
-      return [longitude, latitude]; // MapLibre uses [longitude, latitude]
-    }
-    
     // Extract the numbers and directions
     const parts = coordString.split(' ');
     
@@ -92,65 +84,15 @@ const parseCoordinates = (coordString) => {
   }
 };
 
-// Function to parse coordinates from "6°50'59\"S 107°24'10\"E" format
-const parseDMSCoordinates = (coordString) => {
-  try {
-    // Check if coordString is null or undefined
-    if (!coordString) {
-      console.error("Error parsing DMS coordinates: null");
-      return null;
-    }
-    
-    // Regular expression to extract degrees, minutes, seconds and direction
-    const regex = /(\d+)°(\d+)'(\d+)"([NS])\s+(\d+)°(\d+)'(\d+)"([EW])/;
-    const match = coordString.match(regex);
-    
-    if (!match) {
-      console.error("DMS coordinate format not recognized:", coordString);
-      return null;
-    }
-    
-    const latDeg = parseInt(match[1]);
-    const latMin = parseInt(match[2]);
-    const latSec = parseInt(match[3]);
-    const latDir = match[4];
-    
-    const lngDeg = parseInt(match[5]);
-    const lngMin = parseInt(match[6]);
-    const lngSec = parseInt(match[7]);
-    const lngDir = match[8];
-    
-    // Convert to decimal degrees
-    let latitude = latDeg + latMin/60 + latSec/3600;
-    latitude = latDir === 'S' ? -latitude : latitude;
-    
-    let longitude = lngDeg + lngMin/60 + lngSec/3600;
-    longitude = lngDir === 'W' ? -longitude : longitude;
-    
-    return [longitude, latitude];
-  } catch (error) {
-    console.error("Error parsing DMS coordinates:", coordString, error);
-    return null;
-  }
-};
-
-// Fetch data at build time
+// Fetch cave data at build time
 export async function getStaticProps() {
   try {
-    // Fetch cave data (external)
-    const caveResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caves?limit=-1');
-    const caveData = await caveResponse.json();
+    // Fetch the cave data
+    const response = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caves?limit=-1');
+    const data = await response.json();
     
-    // Fetch Astacala cave data
-    const cavingAstResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caving_ast');
-    const cavingAstData = await cavingAstResponse.json();
-    
-    // Fetch rock climbing data
-    const rockClimbingResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/rock_climbing');
-    const rockClimbingData = await rockClimbingResponse.json();
-    
-    // Transform the external cave data
-    const cavingData = caveData.data.map(cave => {
+    // Transform the API data to match our points format
+    const cavingData = data.data.map(cave => {
       const coordinates = parseCoordinates(cave.titik_koordinat);
       
       // Skip items with invalid coordinates
@@ -162,7 +104,6 @@ export async function getStaticProps() {
         coordinates: coordinates,
         division: 'caving',
         id: cave.id,
-        source: 'external',
         // Store cave data as flat properties to avoid nesting issues
         karakterLorong: cave.karakter_lorong || null,
         totalKedalaman: cave.total_kedalaman || null,
@@ -170,79 +111,26 @@ export async function getStaticProps() {
       };
     }).filter(item => item !== null); // Remove any null items (invalid coordinates)
     
-    // Transform the Astacala cave data
-    const cavingAstPoints = cavingAstData.data.map(cave => {
-      const coordinates = parseDMSCoordinates(cave.titik_koordinat);
-      
-      // Skip items with invalid coordinates
-      if (!coordinates) return null;
-      
-      return {
-        name: cave.nama_gua,
-        description: cave.deskripsi || 'Tidak ada deskripsi',
-        coordinates: coordinates,
-        division: 'caving',
-        id: cave.id,
-        source: 'astacala',
-        // Store cave data as flat properties
-        kegiatan: cave.kegiatan || null,
-        kota: cave.kota || null,
-        provinsi: cave.provinsi || null,
-        kedalaman: cave.kedalaman || null,
-        karakterLorong: cave.karakter_lorong || null,
-        waktuKegiatan: cave.waktu_kegiatan || null,
-        linkRop: cave.link_rop || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform the rock climbing data
-    const rockClimbingPoints = rockClimbingData.data.map(rc => {
-      const coordinates = parseCoordinates(rc.titik_koordinat);
-      
-      // Skip items with invalid coordinates
-      if (!coordinates) return null;
-      
-      return {
-        name: rc.nama_lokasi,
-        description: rc.deskripsi || 'Tidak ada deskripsi',
-        coordinates: coordinates,
-        division: 'panjatTebing',
-        id: rc.id,
-        source: 'astacala',
-        // Store rock climbing data as flat properties
-        kegiatan: rc.kegiatan || null,
-        kota: rc.kota || null,
-        provinsi: rc.provinsi || null,
-        ketinggian: rc.ketinggian || null,
-        waktuKegiatan: rc.waktu_kegiatan || null,
-        linkRop: rc.link_rop || null
-      };
-    }).filter(item => item !== null);
-    
     return {
       props: {
-        cavingData,
-        cavingAstPoints,
-        rockClimbingPoints
+        cavingData
       },
       // Re-generate the page at most once per hour
       revalidate: 3600
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error fetching cave data:", error);
     // Return empty data if fetch fails
     return {
       props: {
-        cavingData: [],
-        cavingAstPoints: [],
-        rockClimbingPoints: []
+        cavingData: []
       },
       revalidate: 60 // Try again sooner if there was an error
     };
   }
 }
 
-export default function MapPage({ cavingData, cavingAstPoints, rockClimbingPoints }) {
+export default function MapPage({ cavingData }) {
   return (
     <>
       <Head>
@@ -336,12 +224,8 @@ export default function MapPage({ cavingData, cavingAstPoints, rockClimbingPoint
         `}</style>
       </Head>
       
-      {/* Pass all data to the map component */}
-      <DynamicMap 
-        cavingData={cavingData} 
-        cavingAstPoints={cavingAstPoints} 
-        rockClimbingPoints={rockClimbingPoints} 
-      />
+      {/* Pass the caving data to the map component */}
+      <DynamicMap cavingData={cavingData} />
     </>
   );
 }

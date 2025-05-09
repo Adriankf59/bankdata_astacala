@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Link from 'next/link';
-import { useState } from 'react';
 
 const activitiesData = {
   'rock-climbing': {
@@ -25,7 +24,40 @@ const activitiesData = {
       { icon: 'fas fa-tools', label: 'Equipment Essentials' },
       { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
     ],
-    // Table will be populated from API data
+    table: {
+      columns: [
+        { key: 'name', label: 'Nama Lokasi' },
+        { key: 'coordinate', label: 'Koordinat' },
+        { key: 'description', label: 'Deskripsi' },
+        { key: 'city', label: 'Kota' },
+        { key: 'province', label: 'Provinsi' },
+        { key: 'rop', label: 'ROP (Google Drive Link)' },
+        { key: 'depth', label: 'Kedalaman' },
+        { key: 'type', label: 'Vertikal/Horizontal' },
+      ],
+      rows: [
+        {
+          name: 'Mount Merapi',
+          coordinate: '-7.5407, 110.4420',
+          description: 'Tebing tinggi dengan pemandangan luar biasa.',
+          city: 'Sleman',
+          province: 'Yogyakarta',
+          rop: 'https://drive.google.com/rop-merapi',
+          depth: '500m',
+          type: 'Vertikal',
+        },
+        {
+          name: 'Goa Jatijajar',
+          coordinate: '-7.7419, 109.8503',
+          description: 'Gua dengan stalaktit dan stalagmit indah.',
+          city: 'Kebumen',
+          province: 'Jawa Tengah',
+          rop: 'https://drive.google.com/rop-jatijajar',
+          depth: '120m',
+          type: 'Horizontal',
+        },
+      ],
+    },
   },
   rafting: {
     title: 'Rafting Division',
@@ -113,9 +145,8 @@ const activitiesData = {
   },
 };
 
-export default function ActivityDetail({ type, astacalaData, externalData }) {
+export default function ActivityDetail({ type, apiData }) {
   const router = useRouter();
-  const [dataSource, setDataSource] = useState('astacala');
   
   // Handle fallback
   if (router.isFallback) {
@@ -130,8 +161,8 @@ export default function ActivityDetail({ type, astacalaData, externalData }) {
   const activity = { ...activitiesData[type] };
 
   // Create table data for rock climbing based on API data
-  if (type === 'rock-climbing' && astacalaData) {
-    const firstItem = astacalaData.data[0];
+  if (type === 'rock-climbing' && apiData) {
+    const firstItem = apiData.data[0];
     
     // Create columns based on the first item keys
     const columns = Object.keys(firstItem)
@@ -150,43 +181,8 @@ export default function ActivityDetail({ type, astacalaData, externalData }) {
     
     activity.table = {
       columns,
-      rows: astacalaData.data
+      rows: apiData.data
     };
-  }
-
-  // Create table data for caving based on API data
-  if (type === 'caving') {
-    if (dataSource === 'astacala' && astacalaData) {
-      activity.table = {
-        columns: [
-          { key: 'nama_gua', label: 'Nama Gua' },
-          { key: 'titik_koordinat', label: 'Koordinat' },
-          { key: 'deskripsi', label: 'Deskripsi' },
-          { key: 'kegiatan', label: 'Kegiatan' },
-          { key: 'kota', label: 'Kota' },
-          { key: 'provinsi', label: 'Provinsi' },
-          { key: 'kedalaman', label: 'Kedalaman (m)' },
-          { key: 'karakter_lorong', label: 'Tipe Lorong' },
-          { key: 'waktu_kegiatan', label: 'Waktu Kegiatan' },
-          { key: 'link_rop', label: 'ROP' },
-        ],
-        rows: astacalaData.data
-      };
-    } else if (dataSource === 'external' && externalData) {
-      activity.table = {
-        columns: [
-          { key: 'nama_gua', label: 'Nama Gua' },
-          { key: 'sinonim', label: 'Sinonim' },
-          { key: 'titik_koordinat', label: 'Koordinat' },
-          { key: 'elevasi_mulut_gua', label: 'Elevasi Mulut Gua (m)' },
-          { key: 'karakter_lorong', label: 'Tipe Lorong' },
-          { key: 'total_kedalaman', label: 'Total Kedalaman (m)' },
-          { key: 'total_panjang', label: 'Total Panjang (m)' },
-          { key: 'status_explore', label: 'Status Eksplorasi' },
-        ],
-        rows: externalData.data
-      };
-    }
   }
 
   return (
@@ -217,35 +213,9 @@ export default function ActivityDetail({ type, astacalaData, externalData }) {
             ))}
           </div>
 
-          {/* Data Source Toggle for Caving */}
-          {type === 'caving' && (
-            <div className="bg-gray-900 rounded-xl shadow p-6 mb-6 border border-gray-800">
-              <h2 className="text-lg md:text-xl font-bold mb-4 text-red-500">Sumber Data</h2>
-              <div className="flex space-x-4">
-                <button 
-                  onClick={() => setDataSource('astacala')}
-                  className={`px-4 py-2 rounded-md ${dataSource === 'astacala' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                >
-                  Data Kegiatan Astacala
-                </button>
-                <button 
-                  onClick={() => setDataSource('external')}
-                  className={`px-4 py-2 rounded-md ${dataSource === 'external' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'}`}
-                >
-                  Data Eksternal
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Location Table */}
           <div className="bg-gray-900 rounded-xl shadow p-6 border border-gray-800">
-            <h2 className="text-lg md:text-xl font-bold mb-4 text-red-500">
-              {type === 'caving' 
-                ? (dataSource === 'astacala' ? 'Data Kegiatan Astacala' : 'Data Eksternal')
-                : 'Lokasi Kegiatan'
-              }
-            </h2>
+            <h2 className="text-lg md:text-xl font-bold mb-4 text-red-500">Lokasi Kegiatan</h2>
             
             {activity.table ? (
               <div className="overflow-x-auto">
@@ -319,6 +289,8 @@ export async function getStaticPaths() {
   ];
   
   // We'll pre-render only these paths at build time
+  // { fallback: false } means other routes should 404
+  // { fallback: true } would enable SSR for paths not returned by getStaticPaths
   return { paths, fallback: false };
 }
 
@@ -327,30 +299,14 @@ export async function getStaticProps({ params }) {
   const { type } = params;
   
   // Fetch data based on type
-  let astacalaData = null;
-  let externalData = null;
+  let apiData = null;
   
   if (type === 'rock-climbing') {
     try {
       const res = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/rock_climbing');
-      astacalaData = await res.json();
+      apiData = await res.json();
     } catch (error) {
       console.error('Failed to fetch rock climbing data:', error);
-      // Continue with null data, the UI will handle it
-    }
-  }
-  
-  if (type === 'caving') {
-    try {
-      // Fetch Astacala caves data
-      const astRes = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caving_ast');
-      astacalaData = await astRes.json();
-      
-      // Fetch external caves data
-      const extRes = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caves?limit=-1');
-      externalData = await extRes.json();
-    } catch (error) {
-      console.error('Failed to fetch caving data:', error);
       // Continue with null data, the UI will handle it
     }
   }
@@ -359,8 +315,7 @@ export async function getStaticProps({ params }) {
   return { 
     props: { 
       type,
-      astacalaData,
-      externalData
+      apiData
     },
     // Re-generate the page at most once per 60 seconds
     // if a request comes in
