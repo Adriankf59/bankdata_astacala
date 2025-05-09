@@ -12,7 +12,7 @@ export default function Home() {
           {/* Background Image */}
           <div 
             className="absolute inset-0 bg-cover bg-center z-0"
-            style={{ backgroundImage: 'url("/bg-astacala.jpg")' }}
+            style={{ backgroundImage: 'url("/bg-asta.jpg")' }}
           />
           
           {/* Dark Overlay */}
