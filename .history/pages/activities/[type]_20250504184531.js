@@ -6,7 +6,7 @@ import Link from 'next/link';
 const activitiesData = {
   'rock-climbing': {
     title: 'Rock Climbing',
-    image: '/rock-climbing.jpg',
+    image: '/images/rock-climbing.jpg',
     description: "Explore the heights of Astacala's mountains with our Rock Climbing Division. Learn about safe climbing techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Climbing Techniques' },
@@ -27,7 +27,7 @@ const activitiesData = {
   },
   caving: {
     title: 'Caving Division',
-    image: '/caving.jpg',
+    image: '/images/caving.jpg',
     description: "Explore the depths of Astacala's caves with our Caving Division. Learn about safe caving techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Caving Techniques' },
@@ -71,7 +71,7 @@ const activitiesData = {
   },
   rafting: {
     title: 'Rafting Division',
-    image: '/rafting.jpg',
+    image: '/images/rafting.jpg',
     description: "Explore the rapids of Astacala's rivers with our Rafting Division. Learn about safe rafting techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Rafting Techniques' },
@@ -92,7 +92,7 @@ const activitiesData = {
   },
   diving: {
     title: 'Diving Division',
-    image: '/diving.jpg',
+    image: '/images/diving.jpg',
     description: "Explore the depths of Astacala's oceans with our Diving Division. Learn about safe diving techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Diving Techniques' },
@@ -113,7 +113,7 @@ const activitiesData = {
   },
   conservation: {
     title: 'Conservation Division',
-    image: '/conservation.jpg',
+    image: '/images/conservation.jpg',
     description: "Join our Conservation Division in preserving and protecting Astacala's environment and wildlife.",
     features: [
       { icon: 'fas fa-book', label: 'Conservation Techniques' },
@@ -134,7 +134,7 @@ const activitiesData = {
   },
   paralayang: {
     title: 'Paralayang Division',
-    image: '/paralayang.jpg',
+    image: '/images/paralayang.jpg',
     description: "Explore the skies of Astacala with our Paralayang Division. Learn about safe paragliding techniques, equipment, and join our thrilling expeditions.",
     features: [
       { icon: 'fas fa-book', label: 'Paragliding Techniques' },
@@ -160,7 +160,7 @@ export default function ActivityDetail() {
   let { type } = router.query;
 
   if (!type || !activitiesData[type]) {
-    return <div className="text-center py-20 bg-black text-white">Activity not found.</div>;
+    return <div className="text-center py-20">Activity not found.</div>;
   }
 
   const activity = activitiesData[type];
@@ -168,26 +168,26 @@ export default function ActivityDetail() {
   return (
     <>
       <Header />
-      <main className="bg-black min-h-screen">
+      <main className="bg-[#f6f6f6] min-h-screen">
         {/* Card utama */}
         <div className="max-w-5xl mx-auto w-full px-4 pt-6 pb-2">
-          <div className="bg-gray-900 rounded-xl shadow flex flex-col md:flex-row p-6 gap-6 items-center mb-6 border border-gray-800">
+          <div className="bg-white rounded-xl shadow flex flex-col md:flex-row p-6 gap-6 items-center mb-6">
             <img src={activity.image} alt={activity.title} className="w-48 h-36 object-cover rounded-lg" />
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-red-500 mb-2">{activity.title}</h1>
-              <p className="text-gray-300 text-base md:text-lg">{activity.description}</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-[#2dd4bf] mb-2">{activity.title}</h1>
+              <p className="text-gray-800 text-base md:text-lg">{activity.description}</p>
             </div>
           </div>
 
           {/* Fitur-fitur */}
-          <div className="bg-gray-900 rounded-xl shadow flex flex-col md:flex-row justify-between items-center p-6 mb-6 gap-6 border border-gray-800">
+          <div className="bg-white rounded-xl shadow flex flex-col md:flex-row justify-between items-center p-6 mb-6 gap-6">
             {activity.features.map((f, idx) => (
               <div key={idx} className="flex flex-col items-center flex-1">
-                <div className="bg-red-600 text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl mb-2">
+                <div className="bg-[#2dd4bf] text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl mb-2">
                   <i className={f.icon}></i>
                 </div>
                 <Link href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`} legacyBehavior>
-                  <a className="font-semibold text-red-500 hover:text-red-400 hover:underline text-center">{f.label}</a>
+                  <a className="font-semibold text-[#2dd4bf] hover:underline text-center">{f.label}</a>
                 </Link>
               </div>
             ))}
@@ -195,12 +195,12 @@ export default function ActivityDetail() {
 
           {/* Tabel Lokasi dinamis */}
           {activity.table && (
-            <div className="bg-gray-900 rounded-xl shadow p-6 border border-gray-800">
-              <h2 className="text-lg md:text-xl font-bold mb-4 text-red-500">Lokasi Kegiatan</h2>
+            <div className="bg-white rounded-xl shadow p-6">
+              <h2 className="text-lg md:text-xl font-bold mb-4 text-[#2dd4bf]">Lokasi Kegiatan</h2>
               <div className="overflow-x-auto">
                 <table className="table-auto w-full">
                   <thead>
-                    <tr className="bg-red-600 text-white">
+                    <tr className="bg-[#2dd4bf] text-white">
                       {activity.table.columns.map((col) => (
                         <th key={col.key} className="py-2 px-4 text-left font-semibold">{col.label}</th>
                       ))}
@@ -208,11 +208,11 @@ export default function ActivityDetail() {
                   </thead>
                   <tbody>
                     {activity.table.rows.map((row, idx) => (
-                      <tr key={idx} className="border-b border-gray-700 last:border-b-0">
+                      <tr key={idx} className="border-b last:border-b-0">
                         {activity.table.columns.map((col) => (
-                          <td key={col.key} className="py-2 px-4 text-gray-300">
+                          <td key={col.key} className="py-2 px-4 text-gray-900">
                             {col.key === 'rop' ? (
-                              <a href={row[col.key]} target="_blank" rel="noopener noreferrer" className="text-red-500 underline font-semibold hover:text-red-400">Link ROP</a>
+                              <a href={row[col.key]} target="_blank" rel="noopener noreferrer" className="text-[#2dd4bf] underline font-semibold">Link ROP</a>
                             ) : (
                               row[col.key]
                             )}
@@ -230,7 +230,7 @@ export default function ActivityDetail() {
       <Footer />
       <style jsx>{`
         h1, h2, h3, h4, h5, h6 {
-          color: #dc2626;
+          color: #2dd4bf;
         }
       `}</style>
     </>
