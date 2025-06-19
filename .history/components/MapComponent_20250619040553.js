@@ -11,8 +11,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
   const [mapStyle, setMapStyle] = useState('outdoor');
   const [showFilters, setShowFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [showLegend, setShowLegend] = useState(true);
-  const [showMapStyles, setShowMapStyles] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     all: true,
     pendaki: true,
@@ -160,23 +158,16 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               division: p.division,
               source: p.source || 'unknown',
               id: p.id || undefined,
-              // Astacala caving fields
               kegiatan: p.kegiatan || null,
               kota: p.kota || null,
               provinsi: p.provinsi || null,
               linkRop: p.linkRop || null,
               waktuKegiatan: p.waktuKegiatan || null,
               karakterLorong: p.karakterLorong || null,
-              kedalaman: p.kedalaman || null,
-              // Klapanunggal caving fields
               totalKedalaman: p.totalKedalaman || null,
               totalPanjang: p.totalPanjang || null,
-              elevasiMulutGua: p.elevasiMulutGua || null,
-              statusExplore: p.statusExplore || null,
-              sinonim: p.sinonim || null,
-              // Rock climbing fields
+              kedalaman: p.kedalaman || null,
               ketinggian: p.ketinggian || null,
-              // ISS data fields
               sumberData: p.sumberData || null,
               jenisPotensiKarst: p.jenisPotensiKarst || null,
               typeGua: p.typeGua || null,
@@ -231,7 +222,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         
         const sourceLabels = {
           astacala: 'Data Kegiatan Astacala',
-          external: 'Data Klapanunggal',
+          external: 'Data Eksternal',
           static: 'Data Statis',
           iss_data: 'Data ISS Karst',
           unknown: 'Sumber Tidak Diketahui'
@@ -248,7 +239,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
           popupContent = `
             <div style="color: white; background-color: rgba(0,0,0,0.7); padding: ${isMobile ? '6px' : '8px'}; border-radius: 4px; border-left: 3px solid ${color};">
               <div style="font-weight: bold; color: ${color}; margin-bottom: ${isMobile ? '6px' : '8px'}; font-size: ${headerFontSize}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                ${feature.properties.name}
+                Gua ${feature.properties.name}
               </div>
               <div style="font-size: ${isMobile ? '11px' : '13px'}; color: #ffffff; margin-bottom: 5px; font-weight: bold;">
                 ${divisionNames[feature.properties.division]} (${sourceLabels[feature.properties.source] || 'Sumber Tidak Diketahui'})
@@ -256,7 +247,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               <div style="margin-top: ${isMobile ? '8px' : '10px'}; font-size: ${baseFontSize}; line-height: 1.5;">
                 <table style="width: 100%; border-collapse: collapse;">`;
           
-          // ISS Data fields
           if (feature.properties.source === 'iss_data') {
             popupContent += `
               <tr>
@@ -270,26 +260,16 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               <tr>
                 <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Jenis Potensi:</td>
                 <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.jenisPotensiKarst || 'Tidak tersedia'}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Tipe Gua:</td>
+                <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.typeGua || 'Tidak tersedia'}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Status Pemetaan:</td>
+                <td style="color: white; ${isMobile ? 'display: block;' : ''}">${feature.properties.statusPemetaanGua || 'Tidak tersedia'}</td>
               </tr>`;
-              
-            if (feature.properties.typeGua) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Tipe Gua:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.typeGua}</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.statusPemetaanGua) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Status Pemetaan:</td>
-                  <td style="color: white; ${isMobile ? 'display: block;' : ''}">${feature.properties.statusPemetaanGua}</td>
-                </tr>`;
-            }
-          } 
-          // Astacala caving fields
-          else if (feature.properties.source === 'astacala') {
+          } else if (feature.properties.source === 'astacala') {
             popupContent += `
               <tr>
                 <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Deskripsi:</td>
@@ -300,30 +280,22 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.kegiatan || 'Tidak tersedia'}</td>
               </tr>
               <tr>
-                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Waktu:</td>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Waktu Kegiatan:</td>
                 <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.waktuKegiatan || 'Tidak tersedia'}</td>
               </tr>
               <tr>
                 <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Lokasi:</td>
                 <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.kota || 'Tidak tersedia'}, ${feature.properties.provinsi || ''}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Kedalaman:</td>
+                <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.kedalaman ? feature.properties.kedalaman + ' m' : 'Tidak tersedia'}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Karakter Lorong:</td>
+                <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.karakterLorong || 'Tidak tersedia'}</td>
               </tr>`;
               
-            if (feature.properties.kedalaman) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Kedalaman:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.kedalaman} m</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.karakterLorong) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Karakter Lorong:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.karakterLorong}</td>
-                </tr>`;
-            }
-            
             if (feature.properties.linkRop) {
               popupContent += `
                 <tr>
@@ -331,59 +303,24 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                   <td style="color: white; ${isMobile ? 'display: block;' : ''}"><a href="${feature.properties.linkRop}" target="_blank" style="color: #ffcc00; text-decoration: underline;">Lihat ROP</a></td>
                 </tr>`;
             }
-          } 
-          // Klapanunggal/External caving fields
-          else if (feature.properties.source === 'external') {
-            // Show sinonim if available
-            if (feature.properties.sinonim) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Nama Lain:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.sinonim}</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.elevasiMulutGua) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Elevasi:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.elevasiMulutGua} m</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.karakterLorong) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Karakter Lorong:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.karakterLorong}</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.totalKedalaman) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Total Kedalaman:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.totalKedalaman} m</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.totalPanjang) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Total Panjang:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.totalPanjang} m</td>
-                </tr>`;
-            }
-            
-            if (feature.properties.statusExplore) {
-              popupContent += `
-                <tr>
-                  <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Status:</td>
-                  <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.statusExplore}</td>
-                </tr>`;
-            }
-            
+          } else {
             popupContent += `
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Karakter Lorong:</td>
+                <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.karakterLorong || 'Tidak tersedia'}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Total Kedalaman:</td>
+                <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.totalKedalaman ? 
+                  (parseFloat(feature.properties.totalKedalaman).toFixed(2) + ' m') : 
+                  'Tidak tersedia'}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Total Panjang:</td>
+                <td style="color: white; ${isMobile ? 'display: block; margin-bottom: 8px;' : ''}">${feature.properties.totalPanjang ? 
+                  (parseFloat(feature.properties.totalPanjang).toFixed(2) + ' m') : 
+                  'Tidak tersedia'}</td>
+              </tr>
               <tr>
                 <td style="font-weight: bold; color: #ffcc00; padding-right: ${isMobile ? '5px' : '10px'}; width: ${labelWidth}; ${isMobile ? 'display: block; margin-bottom: 2px;' : ''}">Deskripsi:</td>
                 <td style="color: white; ${isMobile ? 'display: block;' : ''}">${feature.properties.description || 'Tidak ada deskripsi'}</td>
@@ -476,23 +413,16 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
             division: p.division,
             source: p.source || 'unknown',
             id: p.id || undefined,
-            // Astacala caving fields
             kegiatan: p.kegiatan || null,
             kota: p.kota || null,
             provinsi: p.provinsi || null,
             linkRop: p.linkRop || null,
             waktuKegiatan: p.waktuKegiatan || null,
             karakterLorong: p.karakterLorong || null,
-            kedalaman: p.kedalaman || null,
-            // Klapanunggal caving fields
             totalKedalaman: p.totalKedalaman || null,
             totalPanjang: p.totalPanjang || null,
-            elevasiMulutGua: p.elevasiMulutGua || null,
-            statusExplore: p.statusExplore || null,
-            sinonim: p.sinonim || null,
-            // Rock climbing fields
+            kedalaman: p.kedalaman || null,
             ketinggian: p.ketinggian || null,
-            // ISS data fields
             sumberData: p.sumberData || null,
             jenisPotensiKarst: p.jenisPotensiKarst || null,
             typeGua: p.typeGua || null,
@@ -557,8 +487,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
       style: `https://api.maptiler.com/maps/${mapStyle}/style.json?key=${key}`,
       center: centerCoordinates,
       zoom: isMobile ? 5 : 6,
-      maxPitch: 85,
-      attributionControl: false // Disable attribution
+      maxPitch: 85
     });
     
     newMap.addControl(new maplibregl.NavigationControl({
@@ -595,128 +524,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
       height: '100vh',
       backgroundColor: '#000'
     }}>
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes slideInTop {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes slideInBottom {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes pulse {
-          0% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7);
-          }
-          70% {
-            transform: scale(1.05);
-            box-shadow: 0 0 0 10px rgba(255, 51, 51, 0);
-          }
-          100% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(255, 51, 51, 0);
-          }
-        }
-        
-        @keyframes glow {
-          0% {
-            box-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
-          }
-          50% {
-            box-shadow: 0 0 20px rgba(255, 51, 51, 0.8), 0 0 30px rgba(255, 51, 51, 0.6);
-          }
-          100% {
-            box-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
-          }
-        }
-        
-        @keyframes float {
-          0% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-5px);
-          }
-          100% {
-            transform: translateY(0px);
-          }
-        }
-        
-        @keyframes rotateIn {
-          from {
-            opacity: 0;
-            transform: rotate(-45deg) scale(0.8);
-          }
-          to {
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-          }
-        }
-        
-        .hover-lift {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .hover-lift:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        .hover-glow:hover {
-          animation: glow 2s ease-in-out infinite;
-        }
-        
-        .pulse-on-hover:hover {
-          animation: pulse 1s;
-        }
-      `}</style>
-      
       {/* The map container */}
       <div 
         ref={mapContainerRef} 
@@ -738,21 +545,16 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         display: 'flex',
         flexDirection: 'column',
         gap: isMobile ? '8px' : '10px',
-        zIndex: 10,
-        animation: 'slideIn 0.6s ease-out'
+        zIndex: 10
       }}>
         {/* Home button */}
         <button 
           onClick={() => router.push('/')}
-          className="hover-lift pulse-on-hover"
           style={{
             ...toolButtonStyle,
             backgroundColor: '#1a1a1a',
             color: 'white',
-            border: '1px solid #333',
-            transition: 'all 0.3s ease',
-            animationDelay: '0.1s',
-            animation: 'rotateIn 0.5s ease-out forwards'
+            border: '1px solid #333'
           }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -764,16 +566,11 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         {/* Layer filter button */}
         <button 
           onClick={toggleFilters}
-          className="hover-lift"
           style={{
             ...toolButtonStyle,
             backgroundColor: showFilters ? '#ff3333' : '#1a1a1a',
             color: 'white',
-            border: showFilters ? '1px solid #ff3333' : '1px solid #333',
-            transition: 'all 0.3s ease',
-            animationDelay: '0.2s',
-            animation: 'rotateIn 0.5s ease-out 0.2s forwards',
-            opacity: 0
+            border: showFilters ? '1px solid #ff3333' : '1px solid #333'
           }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -789,167 +586,89 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
           left: isMobile ? 50 : 60,
           top: '50%',
           transform: 'translateY(-50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           padding: isMobile ? '10px' : '15px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          borderRadius: '4px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
           border: '1px solid #ff3333',
           zIndex: 10,
           minWidth: isMobile ? '180px' : '200px',
           maxHeight: isMobile ? '70vh' : 'auto',
-          overflowY: 'auto',
-          animation: 'slideIn 0.3s ease-out',
-          backdropFilter: 'blur(10px)'
+          overflowY: 'auto'
         }}>
-          <div style={{ 
-            fontSize: isMobile ? 12 : 14, 
-            fontWeight: 'bold', 
-            color: '#ff3333', 
-            marginBottom: isMobile ? 8 : 10
-          }}>
+          <div style={{ fontSize: isMobile ? 12 : 14, fontWeight: 'bold', color: '#ff3333', marginBottom: isMobile ? 8 : 10 }}>
             Filter Divisi
           </div>
           
           {/* Checkbox filters */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '6px' : '8px' }}>
-            {[
-              { key: 'all', label: 'Semua Divisi', color: 'white' },
-              { key: 'pendaki', label: 'Divisi Pendakian', color: '#ff3333' },
-              { key: 'panjatTebing', label: 'Divisi Panjat Tebing', color: '#33ff33' },
-              { key: 'paralayang', label: 'Divisi Paralayang', color: '#3333ff' },
-              { key: 'caving', label: 'Divisi Caving', color: '#ffcc00' }
-            ].map((item) => (
-              <label 
-                key={item.key}
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  color: item.color, 
-                  cursor: 'pointer', 
-                  fontSize: isMobile ? '12px' : '14px',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  backgroundColor: 'transparent',
-                  transform: 'translateX(0)',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.transform = 'translateX(5px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }
-                }}
-              >
-                <input 
-                  type="checkbox" 
-                  checked={activeFilters[item.key]}
-                  onChange={() => handleFilterChange(item.key)}
-                  style={{ 
-                    marginRight: '8px', 
-                    width: isMobile ? '16px' : '18px', 
-                    height: isMobile ? '16px' : '18px',
-                    cursor: 'pointer'
-                  }}
-                />
-                {item.label}
-              </label>
-            ))}
+            <label style={{ display: 'flex', alignItems: 'center', color: 'white', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
+              <input 
+                type="checkbox" 
+                checked={activeFilters.all}
+                onChange={() => handleFilterChange('all')}
+                style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
+              />
+              Semua Divisi
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', color: '#ff3333', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
+              <input 
+                type="checkbox" 
+                checked={activeFilters.pendaki}
+                onChange={() => handleFilterChange('pendaki')}
+                style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
+              />
+              Divisi Pendakian
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', color: '#33ff33', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
+              <input 
+                type="checkbox" 
+                checked={activeFilters.panjatTebing}
+                onChange={() => handleFilterChange('panjatTebing')}
+                style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
+              />
+              Divisi Panjat Tebing
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', color: '#3333ff', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
+              <input 
+                type="checkbox" 
+                checked={activeFilters.paralayang}
+                onChange={() => handleFilterChange('paralayang')}
+                style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
+              />
+              Divisi Paralayang
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', color: '#ffcc00', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
+              <input 
+                type="checkbox" 
+                checked={activeFilters.caving}
+                onChange={() => handleFilterChange('caving')}
+                style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
+              />
+              Divisi Caving
+            </label>
             
             {/* Data Source Filter */}
-            <div style={{ 
-              borderTop: '1px solid #333', 
-              marginTop: '8px', 
-              paddingTop: '8px'
-            }}>
-              <label 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  color: 'white', 
-                  cursor: 'pointer', 
-                  fontSize: isMobile ? '12px' : '14px',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  backgroundColor: 'transparent',
-                  transform: 'translateX(0)',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.transform = 'translateX(5px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }
-                }}
-              >
+            <div style={{ borderTop: '1px solid #333', marginTop: '8px', paddingTop: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', color: 'white', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
                 <input 
                   type="checkbox" 
                   checked={activeFilters.astacalaOnly}
                   onChange={() => handleFilterChange('astacalaOnly')}
-                  style={{ 
-                    marginRight: '8px', 
-                    width: isMobile ? '16px' : '18px', 
-                    height: isMobile ? '16px' : '18px',
-                    cursor: 'pointer'
-                  }}
+                  style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
                 />
                 Hanya Data Astacala
               </label>
             </div>
             
             {/* 3D Terrain Checkbox */}
-            <div style={{ 
-              borderTop: '1px solid #333', 
-              marginTop: '8px', 
-              paddingTop: '8px'
-            }}>
-              <label 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  color: 'white', 
-                  cursor: 'pointer', 
-                  fontSize: isMobile ? '12px' : '14px',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  backgroundColor: 'transparent',
-                  transform: 'translateX(0)',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.transform = 'translateX(5px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }
-                }}
-              >
+            <div style={{ borderTop: '1px solid #333', marginTop: '8px', paddingTop: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', color: 'white', cursor: 'pointer', fontSize: isMobile ? '12px' : '14px' }}>
                 <input 
                   type="checkbox" 
                   checked={is3D}
                   onChange={toggle3D}
-                  style={{ 
-                    marginRight: '8px', 
-                    width: isMobile ? '16px' : '18px', 
-                    height: isMobile ? '16px' : '18px',
-                    cursor: 'pointer'
-                  }}
+                  style={{ marginRight: '8px', width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px' }}
                 />
                 Tampilan 3D Terrain
               </label>
@@ -965,75 +684,31 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         left: isMobile ? 10 : 15,
         zIndex: 10,
         display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        animation: 'slideInBottom 0.6s ease-out'
+        gap: isMobile ? '6px' : '8px',
+        backgroundColor: '#1a1a1a',
+        padding: isMobile ? '6px' : '8px',
+        borderRadius: '4px',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+        border: '1px solid #333'
       }}>
-        {/* Toggle button for map styles */}
-        <button
-          onClick={() => setShowMapStyles(!showMapStyles)}
-          className="hover-lift"
-          style={{
-            width: buttonSize,
-            height: buttonSize,
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            backgroundColor: showMapStyles ? '#ff3333' : '#1a1a1a',
-            color: 'white',
-            border: showMapStyles ? '1px solid #ff3333' : '1px solid #333',
-            transition: 'all 0.3s ease'
-          }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="3" x2="9" y2="21"></line>
-            <line x1="15" y1="3" x2="15" y2="21"></line>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="3" y1="15" x2="21" y2="15"></line>
-          </svg>
-        </button>
-        
-        {/* Map style options - shown when expanded */}
-        {showMapStyles && (
-          <div style={{
-            display: 'flex',
-            gap: isMobile ? '6px' : '8px',
-            backgroundColor: 'rgba(26, 26, 26, 0.9)',
-            padding: isMobile ? '6px' : '8px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-            border: '1px solid #333',
-            animation: 'slideIn 0.3s ease-out',
-            backdropFilter: 'blur(10px)'
-          }}>
-            {['outdoor', 'satellite'].map((style, index) => (
-              <button 
-                key={style}
-                onClick={() => changeMapStyle(style)}
-                className="hover-lift"
-                style={{
-                  padding: isMobile ? '4px 8px' : '5px 10px',
-                  border: mapStyle === style ? '1px solid #ff3333' : '1px solid #333',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  backgroundColor: mapStyle === style ? '#ff3333' : '#1a1a1a',
-                  color: 'white',
-                  fontSize: isMobile ? '11px' : '12px',
-                  fontWeight: mapStyle === style ? 'bold' : 'normal',
-                  transition: 'all 0.3s ease',
-                  animation: `fadeIn 0.3s ease-out ${index * 0.1}s forwards`,
-                  opacity: 0
-                }}
-              >
-                {style.charAt(0).toUpperCase() + style.slice(1)}
-              </button>
-            ))}
-          </div>
-        )}
+        {['street', 'outdoor', 'satellite'].map(style => (
+          <button 
+            key={style}
+            onClick={() => changeMapStyle(style)}
+            style={{
+              padding: isMobile ? '4px 8px' : '5px 10px',
+              border: mapStyle === style ? '1px solid #ff3333' : '1px solid #333',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              backgroundColor: mapStyle === style ? '#ff3333' : '#1a1a1a',
+              color: 'white',
+              fontSize: isMobile ? '11px' : '12px',
+              fontWeight: mapStyle === style ? 'bold' : 'normal'
+            }}
+          >
+            {style.charAt(0).toUpperCase() + style.slice(1)}
+          </button>
+        ))}
       </div>
       
       {/* Title header */}
@@ -1043,14 +718,12 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
         padding: isMobile ? '6px 12px' : '10px 20px',
-        borderRadius: '8px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+        borderRadius: '4px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
         border: '1px solid #ff3333',
-        textAlign: 'center',
-        animation: 'slideInTop 0.8s ease-out, glow 3s ease-in-out infinite',
-        backdropFilter: 'blur(10px)'
+        textAlign: 'center'
       }}>
         <h1 style={{ 
           fontSize: isMobile ? 16 : 20, 
@@ -1058,8 +731,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
           color: '#ff3333', 
           margin: 0,
           textTransform: 'uppercase',
-          letterSpacing: isMobile ? '0.5px' : '1px',
-          textShadow: '0 0 10px rgba(255, 51, 51, 0.5)'
+          letterSpacing: isMobile ? '0.5px' : '1px'
         }}>
           Webgis Astacala
         </h1>
@@ -1070,93 +742,37 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
       {/* Legend */}
       <div style={{
         position: 'absolute',
-        bottom: isMobile ? 40 : 40,
+        bottom: isMobile ? 80 : 40,
         right: isMobile ? 10 : 15,
         zIndex: 10,
-        display: 'flex',
-        alignItems: 'flex-end',
-        flexDirection: 'row-reverse',
-        gap: '8px'
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        padding: isMobile ? '8px 10px' : '10px 15px',
+        borderRadius: '4px',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+        border: '1px solid #333',
+        maxWidth: isMobile ? '150px' : 'auto'
       }}>
-        {/* Toggle button for legend */}
-        <button
-          onClick={() => setShowLegend(!showLegend)}
-          className="hover-lift"
-          style={{
-            width: buttonSize,
-            height: buttonSize,
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            backgroundColor: showLegend ? '#ff3333' : '#1a1a1a',
-            color: 'white',
-            border: showLegend ? '1px solid #ff3333' : '1px solid #333',
-            transition: 'all 0.3s ease',
-            animation: 'slideInRight 0.8s ease-out'
-          }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-        </button>
-        
-        {/* Legend content - shown when expanded */}
-        {showLegend && (
-          <div style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            padding: isMobile ? '8px 10px' : '10px 15px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-            border: '1px solid #333',
-            maxWidth: isMobile ? '150px' : 'auto',
-            animation: 'slideInRight 0.3s ease-out',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <div style={{ 
-              fontSize: isMobile ? 11 : 12, 
-              fontWeight: 'bold', 
-              color: 'white', 
-              marginBottom: isMobile ? 6 : 8
-            }}>
-              Legenda
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '4px' : '6px' }}>
-              {[
-                { color: '#ff3333', label: 'Divisi Pendakian' },
-                { color: '#33ff33', label: 'Divisi Panjat Tebing' },
-                { color: '#3333ff', label: 'Divisi Paralayang' },
-                { color: '#ffcc00', label: 'Divisi Caving' }
-              ].map((item) => (
-                <div 
-                  key={item.label}
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center'
-                  }}
-                >
-                  <div style={{ 
-                    width: isMobile ? 10 : 12, 
-                    height: isMobile ? 10 : 12, 
-                    borderRadius: '50%', 
-                    backgroundColor: item.color, 
-                    marginRight: isMobile ? 6 : 8
-                  }}></div>
-                  <span style={{ 
-                    color: 'white', 
-                    fontSize: isMobile ? 10 : 11
-                  }}>
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+        <div style={{ fontSize: isMobile ? 11 : 12, fontWeight: 'bold', color: 'white', marginBottom: isMobile ? 6 : 8 }}>
+          Legenda
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '4px' : '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: isMobile ? 10 : 12, height: isMobile ? 10 : 12, borderRadius: '50%', backgroundColor: '#ff3333', marginRight: isMobile ? 6 : 8 }}></div>
+            <span style={{ color: 'white', fontSize: isMobile ? 10 : 11 }}>Divisi Pendakian</span>
           </div>
-        )}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: isMobile ? 10 : 12, height: isMobile ? 10 : 12, borderRadius: '50%', backgroundColor: '#33ff33', marginRight: isMobile ? 6 : 8 }}></div>
+            <span style={{ color: 'white', fontSize: isMobile ? 10 : 11 }}>Divisi Panjat Tebing</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: isMobile ? 10 : 12, height: isMobile ? 10 : 12, borderRadius: '50%', backgroundColor: '#3333ff', marginRight: isMobile ? 6 : 8 }}></div>
+            <span style={{ color: 'white', fontSize: isMobile ? 10 : 11 }}>Divisi Paralayang</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: isMobile ? 10 : 12, height: isMobile ? 10 : 12, borderRadius: '50%', backgroundColor: '#ffcc00', marginRight: isMobile ? 6 : 8 }}></div>
+            <span style={{ color: 'white', fontSize: isMobile ? 10 : 11 }}>Divisi Caving</span>
+          </div>
+        </div>
       </div>
       
       {/* Bottom copyright bar */}
@@ -1170,11 +786,10 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         justifyContent: 'center',
         alignItems: 'center',
         padding: isMobile ? '6px 10px' : '8px 15px',
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
         borderTop: '1px solid #333',
         color: '#999',
-        fontSize: isMobile ? '11px' : '13px',
-        backdropFilter: 'blur(10px)'
+        fontSize: isMobile ? '11px' : '13px'
       }}>
         <div>
           © Astacala 2025

@@ -66,6 +66,7 @@ const DynamicMap = dynamic(
 // Function to parse coordinates from "6.46966°S 106.95931°E" format to [longitude, latitude]
 const parseCoordinates = (coordString) => {
   try {
+    // Check if coordString is null or undefined
     if (!coordString) {
       console.error("Error parsing coordinates: null");
       return null;
@@ -104,6 +105,7 @@ const parseCoordinates = (coordString) => {
 // Function to parse coordinates from "6°50'59\"S 107°24'10\"E" format
 const parseDMSCoordinates = (coordString) => {
   try {
+    // Check if coordString is null or undefined
     if (!coordString) {
       console.error("Error parsing DMS coordinates: null");
       return null;
@@ -145,57 +147,48 @@ const parseDMSCoordinates = (coordString) => {
 // Fetch data at build time
 export async function getStaticProps() {
   try {
-    const baseURL = 'http://3.106.124.30';
-    
-    // Fetch all data with error handling
-    console.log('Fetching data from Directus...');
-    
-    // Fetch ISS cave data (data karst umum)
-    const issDataResponse = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
-    const issDataRaw = await issDataResponse.json();
-    console.log('ISS Data Response:', issDataRaw);
+    // Fetch cave data (external)
+    const caveResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caves?limit=-1');
+    const caveData = await caveResponse.json();
     
     // Fetch Astacala cave data
-    const cavingAstResponse = await fetch(`${baseURL}/items/caving_astacala?limit=-1`);
+    const cavingAstResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/caving_ast');
     const cavingAstData = await cavingAstResponse.json();
-    console.log('Caving Astacala Response:', cavingAstData);
-    
-    // Fetch Klapanunggal cave data
-    const cavingKlapanunggalResponse = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
-    const cavingKlapanunggalData = await cavingKlapanunggalResponse.json();
-    console.log('Caving Klapanunggal Response:', cavingKlapanunggalData);
     
     // Fetch rock climbing data
-    const rockClimbingResponse = await fetch(`${baseURL}/items/rc_astacala?limit=-1`);
+    const rockClimbingResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/rock_climbing');
     const rockClimbingData = await rockClimbingResponse.json();
-    console.log('Rock Climbing Response:', rockClimbingData);
     
-    // Transform ISS data (menggunakan lat/long langsung)
-    const issDataPoints = (issDataRaw.data || []).map(cave => {
-      // Validasi lat dan long
-      if (!cave.lat || !cave.long || typeof cave.lat !== 'number' || typeof cave.long !== 'number') {
-        return null;
-      }
+    // TAMBAHAN BARU: Fetch ISS data gua
+    const issDataResponse = await fetch('http://ec2-13-239-62-109.ap-southeast-2.compute.amazonaws.com/items/iss_data?limit=-1');
+    const issDataRaw = await issDataResponse.json();
+    
+    // Transform the external cave data
+    const cavingData = caveData.data.map(cave => {
+      const coordinates = parseCoordinates(cave.titik_koordinat);
+      
+      // Skip items with invalid coordinates
+      if (!coordinates) return null;
       
       return {
-        name: cave.nama_potensi_karst,
-        description: cave.deskripsi || 'Tidak ada deskripsi',
-        coordinates: [cave.long, cave.lat], // Format [longitude, latitude]
+        name: cave.nama_gua,
+        description: `Sinonim: ${cave.sinonim || 'Tidak ada'}<br>Elevasi: ${cave.elevasi_mulut_gua} m<br>Status: ${cave.status_explore}`,
+        coordinates: coordinates,
         division: 'caving',
         id: cave.id,
-        source: 'iss_data',
-        // Store ISS data properties
-        sumberData: cave.sumber_data || null,
-        jenisPotensiKarst: cave.jenis_potensi_karst || null,
-        typeGua: cave.type_gua || null,
-        statusPemetaanGua: cave.status_pemetaan_gua || null
+        source: 'external',
+        // Store cave data as flat properties to avoid nesting issues
+        karakterLorong: cave.karakter_lorong || null,
+        totalKedalaman: cave.total_kedalaman || null,
+        totalPanjang: cave.total_panjang || null
       };
-    }).filter(item => item !== null);
+    }).filter(item => item !== null); // Remove any null items (invalid coordinates)
     
-    // Transform Astacala cave data (format DMS)
-    const cavingAstPoints = (cavingAstData.data || []).map(cave => {
+    // Transform the Astacala cave data
+    const cavingAstPoints = cavingAstData.data.map(cave => {
       const coordinates = parseDMSCoordinates(cave.titik_koordinat);
       
+      // Skip items with invalid coordinates
       if (!coordinates) return null;
       
       return {
@@ -205,7 +198,7 @@ export async function getStaticProps() {
         division: 'caving',
         id: cave.id,
         source: 'astacala',
-        // Store Astacala cave data properties
+        // Store cave data as flat properties
         kegiatan: cave.kegiatan || null,
         kota: cave.kota || null,
         provinsi: cave.provinsi || null,
@@ -216,33 +209,11 @@ export async function getStaticProps() {
       };
     }).filter(item => item !== null);
     
-    // Transform Klapanunggal cave data (format decimal degrees)
-    const cavingKlapanunggalPoints = (cavingKlapanunggalData.data || []).map(cave => {
-      const coordinates = parseCoordinates(cave.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: cave.nama_gua,
-        description: `${cave.sinonim ? `Sinonim: ${cave.sinonim}<br>` : ''}Elevasi: ${cave.elevasi_mulut_gua || 'N/A'} m<br>Status: ${cave.status_explore || 'N/A'}`,
-        coordinates: coordinates,
-        division: 'caving',
-        id: cave.id,
-        source: 'external',
-        // Store Klapanunggal cave data properties
-        karakterLorong: cave.karakter_lorong || null,
-        totalKedalaman: cave.total_kedalaman || null,
-        totalPanjang: cave.total_panjang || null,
-        elevasiMulutGua: cave.elevasi_mulut_gua || null,
-        statusExplore: cave.status_explore || null,
-        sinonim: cave.sinonim || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform rock climbing data (format decimal dengan koma)
-    const rockClimbingPoints = (rockClimbingData.data || []).map(rc => {
+    // Transform the rock climbing data
+    const rockClimbingPoints = rockClimbingData.data.map(rc => {
       const coordinates = parseCoordinates(rc.titik_koordinat);
       
+      // Skip items with invalid coordinates
       if (!coordinates) return null;
       
       return {
@@ -252,7 +223,7 @@ export async function getStaticProps() {
         division: 'panjatTebing',
         id: rc.id,
         source: 'astacala',
-        // Store rock climbing data properties
+        // Store rock climbing data as flat properties
         kegiatan: rc.kegiatan || null,
         kota: rc.kota || null,
         provinsi: rc.provinsi || null,
@@ -262,27 +233,41 @@ export async function getStaticProps() {
       };
     }).filter(item => item !== null);
     
-    // Combine all caving data
-    const allCavingData = [
-      ...issDataPoints,
-      ...cavingAstPoints,
-      ...cavingKlapanunggalPoints
-    ];
-    
-    console.log(`Loaded data: 
-      - ISS Data: ${issDataPoints.length} points
-      - Caving Astacala: ${cavingAstPoints.length} points
-      - Caving Klapanunggal: ${cavingKlapanunggalPoints.length} points
-      - Rock Climbing: ${rockClimbingPoints.length} points
-      - Total Caving: ${allCavingData.length} points
-    `);
+    // TAMBAHAN BARU: Transform ISS data gua
+    const issDataPoints = issDataRaw.data.map(cave => {
+      // Pastikan lat dan long bukan string kosong atau null
+      if (!cave.lat || !cave.long || cave.lat === " " || cave.long === " ") return null;
+      
+      // Convert strings to numbers
+      const lat = parseFloat(cave.lat);
+      const long = parseFloat(cave.long);
+      
+      // Validasi apakah konversi berhasil
+      if (isNaN(lat) || isNaN(long)) return null;
+      
+      return {
+        name: cave.nama_potensi_karst,
+        description: cave.deskripsi || 'Tidak ada deskripsi',
+        coordinates: [long, lat], // Format [longitude, latitude] untuk MapLibre
+        division: 'caving',
+        id: cave.id,
+        source: 'iss_data',
+        // Store ISS data as flat properties
+        sumberData: cave.sumber_data || null,
+        jenisPotensiKarst: cave.jenis_potensi_karst || null,
+        typeGua: cave.type_gua?.trim() || null,
+        statusPemetaanGua: cave.status_pemetaan_gua?.trim() || null,
+        // Tambahan properti untuk popup
+        code: cave.code || null
+      };
+    }).filter(item => item !== null);
     
     return {
       props: {
-        cavingData: allCavingData,  // All caving data combined
-        cavingAstPoints: cavingAstPoints,  // Keep separate for filtering
-        rockClimbingPoints: rockClimbingPoints,
-        issDataPoints: issDataPoints  // Keep separate for filtering
+        cavingData,
+        cavingAstPoints,
+        rockClimbingPoints,
+        issDataPoints // Menambahkan data ISS ke dalam props
       },
       // Re-generate the page at most once per hour
       revalidate: 3600
@@ -295,7 +280,7 @@ export async function getStaticProps() {
         cavingData: [],
         cavingAstPoints: [],
         rockClimbingPoints: [],
-        issDataPoints: []
+        issDataPoints: [] // Menambahkan empty array untuk data ISS
       },
       revalidate: 60 // Try again sooner if there was an error
     };
@@ -462,12 +447,12 @@ export default function MapPage({ cavingData, cavingAstPoints, rockClimbingPoint
         `}</style>
       </Head>
       
-      {/* Pass all data to the map component */}
+      {/* Pass all data to the map component, termasuk data ISS */}
       <DynamicMap 
         cavingData={cavingData} 
         cavingAstPoints={cavingAstPoints} 
         rockClimbingPoints={rockClimbingPoints}
-        issDataPoints={issDataPoints}
+        issDataPoints={issDataPoints} // Menambahkan data ISS ke DynamicMap
       />
     </>
   );

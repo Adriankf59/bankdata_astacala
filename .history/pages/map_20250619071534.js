@@ -147,31 +147,24 @@ export async function getStaticProps() {
   try {
     const baseURL = 'http://3.106.124.30';
     
-    // Fetch all data with error handling
-    console.log('Fetching data from Directus...');
-    
     // Fetch ISS cave data (data karst umum)
     const issDataResponse = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
     const issDataRaw = await issDataResponse.json();
-    console.log('ISS Data Response:', issDataRaw);
     
     // Fetch Astacala cave data
     const cavingAstResponse = await fetch(`${baseURL}/items/caving_astacala?limit=-1`);
     const cavingAstData = await cavingAstResponse.json();
-    console.log('Caving Astacala Response:', cavingAstData);
     
     // Fetch Klapanunggal cave data
     const cavingKlapanunggalResponse = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
     const cavingKlapanunggalData = await cavingKlapanunggalResponse.json();
-    console.log('Caving Klapanunggal Response:', cavingKlapanunggalData);
     
     // Fetch rock climbing data
     const rockClimbingResponse = await fetch(`${baseURL}/items/rc_astacala?limit=-1`);
     const rockClimbingData = await rockClimbingResponse.json();
-    console.log('Rock Climbing Response:', rockClimbingData);
     
     // Transform ISS data (menggunakan lat/long langsung)
-    const issDataPoints = (issDataRaw.data || []).map(cave => {
+    const issDataPoints = issDataRaw.data.map(cave => {
       // Validasi lat dan long
       if (!cave.lat || !cave.long || typeof cave.lat !== 'number' || typeof cave.long !== 'number') {
         return null;
@@ -193,7 +186,7 @@ export async function getStaticProps() {
     }).filter(item => item !== null);
     
     // Transform Astacala cave data (format DMS)
-    const cavingAstPoints = (cavingAstData.data || []).map(cave => {
+    const cavingAstPoints = cavingAstData.data.map(cave => {
       const coordinates = parseDMSCoordinates(cave.titik_koordinat);
       
       if (!coordinates) return null;
@@ -217,7 +210,7 @@ export async function getStaticProps() {
     }).filter(item => item !== null);
     
     // Transform Klapanunggal cave data (format decimal degrees)
-    const cavingKlapanunggalPoints = (cavingKlapanunggalData.data || []).map(cave => {
+    const cavingKlapanunggalPoints = cavingKlapanunggalData.data.map(cave => {
       const coordinates = parseCoordinates(cave.titik_koordinat);
       
       if (!coordinates) return null;
@@ -240,7 +233,7 @@ export async function getStaticProps() {
     }).filter(item => item !== null);
     
     // Transform rock climbing data (format decimal dengan koma)
-    const rockClimbingPoints = (rockClimbingData.data || []).map(rc => {
+    const rockClimbingPoints = rockClimbingData.data.map(rc => {
       const coordinates = parseCoordinates(rc.titik_koordinat);
       
       if (!coordinates) return null;
