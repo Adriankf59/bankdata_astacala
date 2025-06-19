@@ -908,6 +908,20 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
     }
   };
 
+  // Add reset bearing handler
+  useEffect(() => {
+    if (map) {
+      // Listen for compass button click
+      const compassButton = document.querySelector('.maplibregl-ctrl-compass');
+      if (compassButton) {
+        compassButton.addEventListener('click', (e) => {
+          // Reset pitch to 0 when compass is clicked
+          map.setPitch(0);
+        });
+      }
+    }
+  }, [map]);
+
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -932,7 +946,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
     setMap(newMap);
     
     return () => newMap.remove();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Dynamic button size based on device
   const buttonSize = isMobile ? '32px' : '36px';
@@ -1151,6 +1165,44 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
           .maplibregl-popup-content > div {
             max-width: 100% !important;
           }
+        }
+        
+        /* Style navigation controls to be gray */
+        .maplibregl-ctrl-group {
+          background: #666 !important;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+        }
+        
+        .maplibregl-ctrl-group > button {
+          background-color: #666 !important;
+          color: #fff !important;
+          border-bottom: 1px solid #555 !important;
+        }
+        
+        .maplibregl-ctrl-group > button:hover {
+          background-color: #777 !important;
+        }
+        
+        .maplibregl-ctrl-group > button:disabled {
+          background-color: #666 !important;
+          opacity: 0.6 !important;
+        }
+        
+        /* Style the compass specifically */
+        .maplibregl-ctrl-compass {
+          background-color: #666 !important;
+        }
+        
+        .maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+          background-color: #666 !important;
+        }
+        
+        .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M10 6C9.446 6 9 6.4459 9 7v2H7c-.5541 0-1 .446-1 1s.4459 1 1 1h2v2c0 .5541.446 1 1 1s1-.4459 1-1v-2h2c.5541 0 1-.446 1-1s-.4459-1-1-1h-2V7c0-.5541-.446-1-1-1z'/%3E%3C/svg%3E");
+        }
+        
+        .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M7 9c-.5541 0-1 .446-1 1s.4459 1 1 1h6c.5541 0 1-.446 1-1s-.4459-1-1-1H7z'/%3E%3C/svg%3E");
         }
       `}</style>
       
