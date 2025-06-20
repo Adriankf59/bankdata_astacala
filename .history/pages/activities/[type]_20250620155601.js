@@ -3,7 +3,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Link from 'next/link';
 import Head from 'next/head';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 
 const activitiesData = {
   'rock-climbing': {
@@ -112,270 +112,6 @@ const activitiesData = {
   },
 };
 
-// Modern Table Component
-function ModernTable({ columns, data }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
-  const itemsPerPage = 10;
-
-  // Search functionality
-  const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
-    
-    return data.filter(row => 
-      columns.some(col => {
-        const value = row[col.key];
-        return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase());
-      })
-    );
-  }, [data, searchTerm, columns]);
-
-  // Sorting functionality
-  const sortedData = useMemo(() => {
-    if (!sortConfig.key) return filteredData;
-
-    return [...filteredData].sort((a, b) => {
-      const aValue = a[sortConfig.key] || '';
-      const bValue = b[sortConfig.key] || '';
-      
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [filteredData, sortConfig]);
-
-  // Pagination
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return sortedData.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedData, currentPage]);
-
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-
-  const handleSort = (key) => {
-    setSortConfig({
-      key,
-      direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc'
-    });
-  };
-
-  const toggleDescription = (rowIndex) => {
-    setExpandedDescriptions(prev => ({
-      ...prev,
-      [rowIndex]: !prev[rowIndex]
-    }));
-  };
-
-  const goToPage = (page) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-    setExpandedDescriptions({}); // Reset expanded descriptions when changing page
-  };
-
-  return (
-    <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Search locations..."
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-            setExpandedDescriptions({}); // Reset expanded descriptions when searching
-          }}
-          className="w-full px-4 py-3 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
-        />
-        <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-      </div>
-
-      {/* Table Container */}
-      <div className="bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gradient-to-r from-red-600 to-red-700">
-                {columns.map((col) => (
-                  <th 
-                    key={col.key}
-                    className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer hover:bg-red-800/50 transition-colors"
-                    onClick={() => handleSort(col.key)}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span className={col.key === 'deskripsi' ? 'max-w-[200px] truncate' : ''}>
-                        {col.label}
-                      </span>
-                      {sortConfig.key === col.key && (
-                        <i className={`fas fa-chevron-${sortConfig.direction === 'asc' ? 'up' : 'down'} text-xs`}></i>
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700">
-              {paginatedData.length > 0 ? (
-                paginatedData.map((row, idx) => (
-                  <tr 
-                    key={idx} 
-                    className="hover:bg-gray-700/50 transition-all duration-200 hover:transform hover:scale-[1.01]"
-                  >
-                    {columns.map((col) => (
-                      <td key={col.key} className="px-6 py-4 text-sm text-gray-300">
-                        {col.key === 'link_rop' && row[col.key] ? (
-                          <a 
-                            href={row[col.key]} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="inline-flex items-center px-3 py-1 bg-red-600/20 text-red-400 rounded-full hover:bg-red-600/30 transition-colors"
-                          >
-                            <i className="fas fa-external-link-alt mr-1 text-xs"></i>
-                            <span className="text-xs font-medium">View</span>
-                          </a>
-                        ) : col.key === 'titik_koordinat' && row[col.key] ? (
-                          <a 
-                            href={`https://www.google.com/maps/search/?api=1&query=${row[col.key]}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors"
-                          >
-                            <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
-                            <span className="text-xs font-medium truncate max-w-[150px]">{row[col.key]}</span>
-                          </a>
-                        ) : (col.key === 'lat' || col.key === 'long') && row.lat && row.long ? (
-                          col.key === 'lat' ? (
-                            <a 
-                              href={`https://www.google.com/maps/search/?api=1&query=${row.lat},${row.long}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors"
-                            >
-                              <i className="fas fa-globe mr-1 text-xs"></i>
-                              <span className="text-xs font-medium">{row[col.key]}</span>
-                            </a>
-                          ) : (
-                            <span className="text-xs">{row[col.key]}</span>
-                          )
-                        ) : col.key === 'deskripsi' && row[col.key] ? (
-                          <div className="relative">
-                            <div className={`${!expandedDescriptions[idx] ? 'max-w-[300px] truncate' : ''}`}>
-                              {row[col.key]}
-                            </div>
-                            {row[col.key].length > 50 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleDescription(idx);
-                                }}
-                                className="text-blue-400 hover:text-blue-300 text-xs mt-1 underline transition-colors"
-                              >
-                                {expandedDescriptions[idx] ? 'Lihat lebih sedikit' : 'Lihat selengkapnya'}
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <span className={!row[col.key] ? 'text-gray-500 italic' : ''}>
-                            {row[col.key] || '-'}
-                          </span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-400">
-                    <div className="flex flex-col items-center">
-                      <i className="fas fa-search text-4xl mb-3 opacity-20"></i>
-                      <p>No results found</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-gray-900/50 px-6 py-4 border-t border-gray-700">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-gray-400">
-                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, sortedData.length)} of {sortedData.length} results
-              </p>
-              
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => goToPage(1)}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <i className="fas fa-angle-double-left"></i>
-                </button>
-                
-                <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <i className="fas fa-angle-left"></i>
-                </button>
-                
-                <div className="flex items-center space-x-1">
-                  {[...Array(Math.min(5, totalPages))].map((_, idx) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = idx + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = idx + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + idx;
-                    } else {
-                      pageNum = currentPage - 2 + idx;
-                    }
-                    
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => goToPage(pageNum)}
-                        className={`min-w-[40px] px-3 py-2 rounded-lg font-medium transition-all ${
-                          currentPage === pageNum 
-                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <i className="fas fa-angle-right"></i>
-                </button>
-                
-                <button
-                  onClick={() => goToPage(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <i className="fas fa-angle-double-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function ActivityDetail({ type, astacalaData, externalData, issData }) {
   const router = useRouter();
   const [dataSource, setDataSource] = useState('astacala');
@@ -483,7 +219,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
   return (
     <>
       <Head>
-        <title>{`${activity.title} - Astacala`}</title>
+        <title>{activity.title} - Astacala</title>
         <meta name="description" content={activity.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
@@ -532,11 +268,8 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 <div className="bg-red-600 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-xl sm:text-2xl mb-2 transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <i className={f.icon}></i>
                 </div>
-                <Link 
-                  href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="font-semibold text-red-500 hover:text-red-400 text-center text-sm sm:text-base transition-colors"
-                >
-                  {f.label}
+                <Link href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`} legacyBehavior>
+                  <a className="font-semibold text-red-500 hover:text-red-400 text-center text-sm sm:text-base transition-colors">{f.label}</a>
                 </Link>
               </div>
             ))}
@@ -584,9 +317,9 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
             </div>
           )}
 
-          {/* Modern Table Section */}
+          {/* Location Table - Responsive */}
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 border border-gray-800">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
               <h2 className="text-lg sm:text-xl font-bold text-red-500">
                 {type === 'caving' 
                   ? (dataSource === 'astacala' ? 'Data Kegiatan Astacala' : dataSource === 'external' ? 'Data Klapanunggal' : 'Data Karst Umum (ISS)')
@@ -594,27 +327,89 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 }
               </h2>
               {activity.table && activity.table.rows && (
-                <div className="flex items-center space-x-2">
-                  <i className="fas fa-chart-bar text-red-500"></i>
-                  <span className="text-sm text-gray-400">
-                    Total: {activity.table.rows.length} lokasi
-                  </span>
-                </div>
+                <span className="text-sm text-gray-400">
+                  Total: {activity.table.rows.length} lokasi
+                </span>
               )}
             </div>
             
-            {activity.table && activity.table.rows ? (
-              <ModernTable 
-                columns={activity.table.columns}
-                data={activity.table.rows}
-              />
-            ) : (
-              <div className="text-center py-12">
-                <div className="text-5xl mb-4 opacity-20">
-                  <i className="fas fa-map-marked-alt"></i>
+            {activity.table && activity.table.rows && activity.table.rows.length > 0 ? (
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="inline-block min-w-full align-middle">
+                  <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-700">
+                      <thead className="bg-red-600">
+                        <tr>
+                          {activity.table.columns.map((col) => (
+                            <th 
+                              key={col.key} 
+                              className={`px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider whitespace-nowrap ${
+                                col.key === 'deskripsi' ? 'min-w-[200px] max-w-[300px]' : ''
+                              }`}
+                            >
+                              {col.label}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="bg-gray-800 divide-y divide-gray-700">
+                        {activity.table.rows.map((row, idx) => (
+                          <tr key={idx} className="hover:bg-gray-700 transition-colors">
+                            {activity.table.columns.map((col) => (
+                              <td key={col.key} className="px-4 py-3 text-sm text-gray-300 whitespace-nowrap">
+                                {col.key === 'link_rop' && row[col.key] ? (
+                                  <a 
+                                    href={row[col.key]} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="text-red-500 hover:text-red-400 font-semibold transition-colors"
+                                  >
+                                    <i className="fas fa-external-link-alt mr-1"></i>
+                                    Link
+                                  </a>
+                                ) : col.key === 'titik_koordinat' && row[col.key] ? (
+                                  <a 
+                                    href={`https://www.google.com/maps/search/?api=1&query=${row[col.key]}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:text-blue-300 transition-colors"
+                                  >
+                                    <i className="fas fa-map-marker-alt mr-1"></i>
+                                    {row[col.key]}
+                                  </a>
+                                ) : (col.key === 'lat' || col.key === 'long') && row.lat && row.long ? (
+                                  col.key === 'lat' ? (
+                                    <a 
+                                      href={`https://www.google.com/maps/search/?api=1&query=${row.lat},${row.long}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                                    >
+                                      <i className="fas fa-map-marker-alt mr-1"></i>
+                                      {row[col.key]}
+                                    </a>
+                                  ) : (
+                                    <span>{row[col.key]}</span>
+                                  )
+                                ) : (
+                                  <span className={`${!row[col.key] ? 'text-gray-500 italic' : ''} ${col.key === 'deskripsi' ? 'description-cell block' : ''}`}
+                                        title={col.key === 'deskripsi' ? row[col.key] : undefined}>
+                                    {row[col.key] || 'N/A'}
+                                  </span>
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <p className="text-gray-400 text-lg">No location data available</p>
-                <p className="text-gray-500 text-sm mt-2">Check back later for updates</p>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-3 opacity-20">📍</div>
+                <p className="text-gray-400">No location data available</p>
               </div>
             )}
           </div>
@@ -649,10 +444,25 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
             animation-delay: 4s;
           }
           
-          @media (prefers-reduced-motion: reduce) {
-            .animate-blob {
-              animation: none;
-            }
+          /* Table cell styles for description */
+          .description-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          
+          .description-cell:hover {
+            overflow: visible;
+            white-space: normal;
+            word-break: break-word;
+            z-index: 10;
+            position: relative;
+            background-color: #1a1a1a;
+            padding: 8px;
+            border: 1px solid #ff3333;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
           }
         `}</style>
       </main>
@@ -706,7 +516,7 @@ export async function getStaticProps({ params }) {
       const extRes = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
       externalData = await extRes.json();
       
-      // Fetch ISS cave data - same as map.js  
+      // Fetch ISS cave data - same as map.js
       const issRes = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
       issData = await issRes.json();
     } catch (error) {
@@ -714,25 +524,12 @@ export async function getStaticProps({ params }) {
     }
   }
   
-  // Process data to reduce size - only send necessary fields
-  const processData = (data) => {
-    if (!data || !data.data) return null;
-    return {
-      ...data,
-      data: data.data.map(item => {
-        // Remove unnecessary fields to reduce data size
-        const { user_created, user_updated, date_created, date_updated, ...rest } = item;
-        return rest;
-      })
-    };
-  };
-  
   return { 
     props: { 
       type,
-      astacalaData: processData(astacalaData),
-      externalData: processData(externalData),
-      issData: processData(issData)
+      astacalaData,
+      externalData,
+      issData
     },
     revalidate: 3600, // Same as map.js - revalidate every hour
   };

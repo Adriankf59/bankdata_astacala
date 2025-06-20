@@ -46,7 +46,7 @@ const DIRECT_CONTACT = [
   },
   {
     name: 'WhatsApp',
-    url: 'https://wa.me/6285158556208',
+    url: 'https://wa.me/628538320635',
     icon: 'fab fa-whatsapp',
     color: '#25D366',
     description: 'Chat langsung via WhatsApp',
@@ -274,14 +274,14 @@ export default function Contact() {
           
           <div className="rounded-xl overflow-hidden border border-gray-800 h-80 sm:h-96 hover:border-gray-700 transition-colors">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.3201239228736!2d107.62534481535224!3d-6.973006970190073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e9adf177bf8d%3A0x437398556f9fa03!2sUniversitas%20Telkom!5e0!3m2!1sen!2sid!4v1652345678901!5m2!1sen!2sid"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d987.5758990825!2d107.62907776956!3d-6.97502669955!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e9b2e87b3823%3A0x29125df4ba47cf82!2sStudent%20Hall%20(Gate%204)%20Universitas%20Telkom!5e0!3m2!1sid!2sid!4v1698123456789!5m2!1sid!2sid"
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen=""
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Astacala Location Map"
+              title="Astacala Location Map - Student Hall Gate 4"
               className="grayscale hover:grayscale-0 transition-all duration-500"
             ></iframe>
           </div>

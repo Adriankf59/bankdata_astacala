@@ -302,55 +302,8 @@ const rescueOperations = [
     casualties: "3 korban jiwa",
     image: "/flood-bandung.jpg",
     details: "Tim Astacala membantu evakuasi penduduk, distribusi bantuan logistik, dan pendirian dapur umum di pengungsian. Tim juga membantu membersihkan fasilitas publik seperti sekolah dari lumpur pasca banjir surut."
-  },
-  {
-    id: 25,
-    title: "Tanggap Bencana Gempa Sumedang",
-    date: "2023",
-    location: "Sumedang, Jawa Barat",
-    type: "earthquake",
-    description: "Respons tanggap darurat untuk gempa bumi berkekuatan 4.8 SR yang melanda Kabupaten Sumedang pada 31 Desember 2023, menimbulkan kerusakan signifikan di wilayah tersebut.",
-    team: "Unit Rescue Astacala",
-    casualties: "13 korban jiwa",
-    image: "/earthquake-sumedang.jpg",
-    details: "Tim Astacala berpartisipasi aktif dalam pencarian informasi dan asesmen di lokasi bencana. Gempa terjadi pukul 20:34:24 WIB dengan episenter 2 km Timur Laut Kab. Sumedang pada kedalaman 5 km. Total 1.462 unit bangunan mengalami kerusakan. Tim melakukan asesmen pada 1 Januari 2024."
-  },
-  {
-    id: 26,
-    title: "Tanggap Bencana Gempa Kabupaten Bandung - Pangalengan",
-    date: "2024",
-    location: "Pangalengan dan Kertasari, Kabupaten Bandung",
-    type: "earthquake",
-    description: "Operasi tanggap darurat untuk gempa bumi M 5.0 yang melanda Kabupaten Bandung pada 18 September 2024, menyebabkan kerusakan luas di Kecamatan Pangalengan dan Kertasari.",
-    team: "Unit Rescue Astacala",
-    casualties: "Data tidak tersedia",
-    image: "/earthquake-pangalengan.jpg",
-    details: "Tim Astacala melakukan asesmen kerusakan pasca gempa yang disebabkan aktivitas Sesar Garsela. Desa Wanasuka mengalami kerusakan terparah. Total kerusakan: 491 rumah, 9 sekolah, 27 tempat ibadah, fasilitas kesehatan, dan berbagai bangunan publik lainnya."
-  },
-  {
-    id: 27,
-    title: "Tanggap Bencana Banjir Kabupaten Bandung - Baleendah",
-    date: "2024",
-    location: "Baleendah, Bojongsoang, Dayeuhkolot, dan Cilampeni, Kabupaten Bandung",
-    type: "floodslide",
-    description: "Respons tanggap darurat untuk banjir besar yang melanda kawasan Bandung Selatan pada 20-24 November 2024, menenggelamkan ribuan rumah dan mengisolasi beberapa wilayah.",
-    team: "Unit Rescue Astacala",
-    casualties: "Tidak ada korban jiwa",
-    image: "/flood-baleendah.jpg",
-    details: "Tim Astacala berpartisipasi dalam asesmen dampak banjir yang melanda 4 kecamatan. Total dampak: 2.014 rumah terendam, 35.262 jiwa terdampak dari 12.250 KK, 427 sarana pendidikan tergenang. Pengungsian dipusatkan di Taman Air Bojongsoang dan lokasi lainnya."
-  },
-  {
-    id: 28,
-    title: "Tanggap Bencana Banjir Kabupaten Bandung - Sukabirus",
-    date: "2025",
-    location: "Sukabirus, Desa Citeureup, Kecamatan Dayeuhkolot, Kabupaten Bandung",
-    type: "floodslide",
-    description: "Operasi tanggap darurat untuk banjir akibat jebolnya tanggul dan meluapnya anak sungai Citarum pada 15 Maret 2025, dengan ketinggian air mencapai 160 cm.",
-    team: "Unit Rescue Astacala",
-    casualties: "Tidak ada korban jiwa",
-    image: "/flood-sukabirus.jpg",
-    details: "Tim Astacala melakukan asesmen di lokasi banjir yang disebabkan hujan intensitas tinggi dan jebolnya tanggul. RW 13 Sukabirus paling terdampak. Total 99 KK (325 jiwa) mengungsi di 5 lokasi: Masjid At Taqwa, An Nur, Al Ikhlas, dan Miftahul Jannah. Satu rumah dan mushola hampir ambruk."
   }
+  
 ];
 
 // Filter options for the rescue types

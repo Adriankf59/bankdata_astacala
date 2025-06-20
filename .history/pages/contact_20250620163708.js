@@ -46,7 +46,7 @@ const DIRECT_CONTACT = [
   },
   {
     name: 'WhatsApp',
-    url: 'https://wa.me/6285158556208',
+    url: 'https://wa.me/6285383206355',
     icon: 'fab fa-whatsapp',
     color: '#25D366',
     description: 'Chat langsung via WhatsApp',

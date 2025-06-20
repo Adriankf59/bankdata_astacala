@@ -302,7 +302,7 @@ const rescueOperations = [
     casualties: "3 korban jiwa",
     image: "/flood-bandung.jpg",
     details: "Tim Astacala membantu evakuasi penduduk, distribusi bantuan logistik, dan pendirian dapur umum di pengungsian. Tim juga membantu membersihkan fasilitas publik seperti sekolah dari lumpur pasca banjir surut."
-  },
+  }
   {
     id: 25,
     title: "Tanggap Bencana Gempa Sumedang",

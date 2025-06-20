@@ -145,7 +145,7 @@ const parseDMSCoordinates = (coordString) => {
 // Fetch data at build time
 export async function getStaticProps() {
   try {
-    const baseURL = 'http://52.64.175.183';
+    const baseURL = 'http://3.106.124.30';
     
     // Fetch all data with error handling
     console.log('Fetching data from Directus...');

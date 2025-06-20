@@ -117,7 +117,6 @@ function ModernTable({ columns, data }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const itemsPerPage = 10;
 
   // Search functionality
@@ -161,16 +160,8 @@ function ModernTable({ columns, data }) {
     });
   };
 
-  const toggleDescription = (rowIndex) => {
-    setExpandedDescriptions(prev => ({
-      ...prev,
-      [rowIndex]: !prev[rowIndex]
-    }));
-  };
-
   const goToPage = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-    setExpandedDescriptions({}); // Reset expanded descriptions when changing page
   };
 
   return (
@@ -184,7 +175,6 @@ function ModernTable({ columns, data }) {
           onChange={(e) => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
-            setExpandedDescriptions({}); // Reset expanded descriptions when searching
           }}
           className="w-full px-4 py-3 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
         />
@@ -259,20 +249,14 @@ function ModernTable({ columns, data }) {
                             <span className="text-xs">{row[col.key]}</span>
                           )
                         ) : col.key === 'deskripsi' && row[col.key] ? (
-                          <div className="relative">
-                            <div className={`${!expandedDescriptions[idx] ? 'max-w-[300px] truncate' : ''}`}>
+                          <div className="group relative">
+                            <span className="block max-w-[300px] truncate">
                               {row[col.key]}
-                            </div>
+                            </span>
                             {row[col.key].length > 50 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleDescription(idx);
-                                }}
-                                className="text-blue-400 hover:text-blue-300 text-xs mt-1 underline transition-colors"
-                              >
-                                {expandedDescriptions[idx] ? 'Lihat lebih sedikit' : 'Lihat selengkapnya'}
-                              </button>
+                              <div className="absolute z-10 invisible group-hover:visible bg-gray-900 border border-red-500/50 rounded-lg p-3 mt-1 w-80 shadow-xl">
+                                <p className="text-sm text-gray-200 break-words">{row[col.key]}</p>
+                              </div>
                             )}
                           </div>
                         ) : (

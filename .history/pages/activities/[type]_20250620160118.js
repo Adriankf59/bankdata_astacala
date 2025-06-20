@@ -117,7 +117,6 @@ function ModernTable({ columns, data }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const itemsPerPage = 10;
 
   // Search functionality
@@ -161,16 +160,8 @@ function ModernTable({ columns, data }) {
     });
   };
 
-  const toggleDescription = (rowIndex) => {
-    setExpandedDescriptions(prev => ({
-      ...prev,
-      [rowIndex]: !prev[rowIndex]
-    }));
-  };
-
   const goToPage = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-    setExpandedDescriptions({}); // Reset expanded descriptions when changing page
   };
 
   return (
@@ -184,7 +175,6 @@ function ModernTable({ columns, data }) {
           onChange={(e) => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
-            setExpandedDescriptions({}); // Reset expanded descriptions when searching
           }}
           className="w-full px-4 py-3 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
         />
@@ -259,20 +249,14 @@ function ModernTable({ columns, data }) {
                             <span className="text-xs">{row[col.key]}</span>
                           )
                         ) : col.key === 'deskripsi' && row[col.key] ? (
-                          <div className="relative">
-                            <div className={`${!expandedDescriptions[idx] ? 'max-w-[300px] truncate' : ''}`}>
+                          <div className="group relative">
+                            <span className="block max-w-[300px] truncate">
                               {row[col.key]}
-                            </div>
+                            </span>
                             {row[col.key].length > 50 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleDescription(idx);
-                                }}
-                                className="text-blue-400 hover:text-blue-300 text-xs mt-1 underline transition-colors"
-                              >
-                                {expandedDescriptions[idx] ? 'Lihat lebih sedikit' : 'Lihat selengkapnya'}
-                              </button>
+                              <div className="absolute z-10 invisible group-hover:visible bg-gray-900 border border-red-500/50 rounded-lg p-3 mt-1 w-80 shadow-xl">
+                                <p className="text-sm text-gray-200 break-words">{row[col.key]}</p>
+                              </div>
                             )}
                           </div>
                         ) : (
@@ -483,7 +467,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
   return (
     <>
       <Head>
-        <title>{`${activity.title} - Astacala`}</title>
+        <title>{activity.title} - Astacala</title>
         <meta name="description" content={activity.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
@@ -532,11 +516,8 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 <div className="bg-red-600 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-xl sm:text-2xl mb-2 transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <i className={f.icon}></i>
                 </div>
-                <Link 
-                  href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="font-semibold text-red-500 hover:text-red-400 text-center text-sm sm:text-base transition-colors"
-                >
-                  {f.label}
+                <Link href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`} legacyBehavior>
+                  <a className="font-semibold text-red-500 hover:text-red-400 text-center text-sm sm:text-base transition-colors">{f.label}</a>
                 </Link>
               </div>
             ))}
@@ -706,7 +687,7 @@ export async function getStaticProps({ params }) {
       const extRes = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
       externalData = await extRes.json();
       
-      // Fetch ISS cave data - same as map.js  
+      // Fetch ISS cave data - same as map.js
       const issRes = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
       issData = await issRes.json();
     } catch (error) {
@@ -714,25 +695,12 @@ export async function getStaticProps({ params }) {
     }
   }
   
-  // Process data to reduce size - only send necessary fields
-  const processData = (data) => {
-    if (!data || !data.data) return null;
-    return {
-      ...data,
-      data: data.data.map(item => {
-        // Remove unnecessary fields to reduce data size
-        const { user_created, user_updated, date_created, date_updated, ...rest } = item;
-        return rest;
-      })
-    };
-  };
-  
   return { 
     props: { 
       type,
-      astacalaData: processData(astacalaData),
-      externalData: processData(externalData),
-      issData: processData(issData)
+      astacalaData,
+      externalData,
+      issData
     },
     revalidate: 3600, // Same as map.js - revalidate every hour
   };

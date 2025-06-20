@@ -142,125 +142,187 @@ const parseDMSCoordinates = (coordString) => {
   }
 };
 
+// Custom fetch with timeout and retry
+const fetchWithRetry = async (url, options = {}, retries = 3) => {
+  const timeout = options.timeout || 30000; // 30 seconds default
+  
+  for (let i = 0; i < retries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response;
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed:`, error.message);
+      
+      if (i === retries - 1) {
+        throw error;
+      }
+      
+      // Wait before retry (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+    }
+  }
+};
+
 // Fetch data at build time
 export async function getStaticProps() {
   try {
-    const baseURL = 'http://52.64.175.183';
+    // Use environment variable or fallback
+    const baseURL = process.env.DIRECTUS_URL || 'http://3.106.124.30';
     
-    // Fetch all data with error handling
-    console.log('Fetching data from Directus...');
+    console.log('Fetching data from Directus at:', baseURL);
     
-    // Fetch ISS cave data (data karst umum)
-    const issDataResponse = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
-    const issDataRaw = await issDataResponse.json();
-    console.log('ISS Data Response:', issDataRaw);
+    // Initialize empty arrays
+    let issDataPoints = [];
+    let cavingAstPoints = [];
+    let cavingKlapanunggalPoints = [];
+    let rockClimbingPoints = [];
+    
+    // Try to fetch each dataset individually with error handling
+    
+    // Fetch ISS cave data
+    try {
+      console.log('Fetching ISS data...');
+      const issDataResponse = await fetchWithRetry(`${baseURL}/items/caving_data_iss?limit=-1`, { timeout: 45000 });
+      const issDataRaw = await issDataResponse.json();
+      console.log('ISS Data received:', issDataRaw.data?.length || 0, 'items');
+      
+      // Transform ISS data
+      issDataPoints = (issDataRaw.data || []).map(cave => {
+        if (!cave.lat || !cave.long || typeof cave.lat !== 'number' || typeof cave.long !== 'number') {
+          return null;
+        }
+        
+        return {
+          name: cave.nama_potensi_karst || 'Unknown Cave',
+          description: cave.deskripsi || 'Tidak ada deskripsi',
+          coordinates: [cave.long, cave.lat],
+          division: 'caving',
+          id: cave.id,
+          source: 'iss_data',
+          sumberData: cave.sumber_data || null,
+          jenisPotensiKarst: cave.jenis_potensi_karst || null,
+          typeGua: cave.type_gua || null,
+          statusPemetaanGua: cave.status_pemetaan_gua || null
+        };
+      }).filter(item => item !== null);
+    } catch (error) {
+      console.error('Failed to fetch ISS data:', error.message);
+    }
     
     // Fetch Astacala cave data
-    const cavingAstResponse = await fetch(`${baseURL}/items/caving_astacala?limit=-1`);
-    const cavingAstData = await cavingAstResponse.json();
-    console.log('Caving Astacala Response:', cavingAstData);
+    try {
+      console.log('Fetching Astacala caving data...');
+      const cavingAstResponse = await fetchWithRetry(`${baseURL}/items/caving_astacala?limit=-1`, { timeout: 45000 });
+      const cavingAstData = await cavingAstResponse.json();
+      console.log('Astacala Caving data received:', cavingAstData.data?.length || 0, 'items');
+      
+      // Transform Astacala cave data
+      cavingAstPoints = (cavingAstData.data || []).map(cave => {
+        const coordinates = parseDMSCoordinates(cave.titik_koordinat);
+        
+        if (!coordinates) return null;
+        
+        return {
+          name: cave.nama_gua || 'Unknown Cave',
+          description: cave.deskripsi || 'Tidak ada deskripsi',
+          coordinates: coordinates,
+          division: 'caving',
+          id: cave.id,
+          source: 'astacala',
+          kegiatan: cave.kegiatan || null,
+          kota: cave.kota || null,
+          provinsi: cave.provinsi || null,
+          kedalaman: cave.kedalaman || null,
+          karakterLorong: cave.karakter_lorong || null,
+          waktuKegiatan: cave.waktu_kegiatan || null,
+          linkRop: cave.link_rop || null
+        };
+      }).filter(item => item !== null);
+    } catch (error) {
+      console.error('Failed to fetch Astacala caving data:', error.message);
+    }
     
     // Fetch Klapanunggal cave data
-    const cavingKlapanunggalResponse = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
-    const cavingKlapanunggalData = await cavingKlapanunggalResponse.json();
-    console.log('Caving Klapanunggal Response:', cavingKlapanunggalData);
+    try {
+      console.log('Fetching Klapanunggal data...');
+      const cavingKlapanunggalResponse = await fetchWithRetry(`${baseURL}/items/caving_klapanunggal?limit=-1`, { timeout: 45000 });
+      const cavingKlapanunggalData = await cavingKlapanunggalResponse.json();
+      console.log('Klapanunggal data received:', cavingKlapanunggalData.data?.length || 0, 'items');
+      
+      // Transform Klapanunggal cave data
+      cavingKlapanunggalPoints = (cavingKlapanunggalData.data || []).map(cave => {
+        const coordinates = parseCoordinates(cave.titik_koordinat);
+        
+        if (!coordinates) return null;
+        
+        return {
+          name: cave.nama_gua || 'Unknown Cave',
+          description: `${cave.sinonim ? `Sinonim: ${cave.sinonim}<br>` : ''}Elevasi: ${cave.elevasi_mulut_gua || 'N/A'} m<br>Status: ${cave.status_explore || 'N/A'}`,
+          coordinates: coordinates,
+          division: 'caving',
+          id: cave.id,
+          source: 'external',
+          karakterLorong: cave.karakter_lorong || null,
+          totalKedalaman: cave.total_kedalaman || null,
+          totalPanjang: cave.total_panjang || null,
+          elevasiMulutGua: cave.elevasi_mulut_gua || null,
+          statusExplore: cave.status_explore || null,
+          sinonim: cave.sinonim || null
+        };
+      }).filter(item => item !== null);
+    } catch (error) {
+      console.error('Failed to fetch Klapanunggal data:', error.message);
+    }
     
     // Fetch rock climbing data
-    const rockClimbingResponse = await fetch(`${baseURL}/items/rc_astacala?limit=-1`);
-    const rockClimbingData = await rockClimbingResponse.json();
-    console.log('Rock Climbing Response:', rockClimbingData);
-    
-    // Transform ISS data (menggunakan lat/long langsung)
-    const issDataPoints = (issDataRaw.data || []).map(cave => {
-      // Validasi lat dan long
-      if (!cave.lat || !cave.long || typeof cave.lat !== 'number' || typeof cave.long !== 'number') {
-        return null;
-      }
+    try {
+      console.log('Fetching rock climbing data...');
+      const rockClimbingResponse = await fetchWithRetry(`${baseURL}/items/rc_astacala?limit=-1`, { timeout: 45000 });
+      const rockClimbingData = await rockClimbingResponse.json();
+      console.log('Rock climbing data received:', rockClimbingData.data?.length || 0, 'items');
       
-      return {
-        name: cave.nama_potensi_karst,
-        description: cave.deskripsi || 'Tidak ada deskripsi',
-        coordinates: [cave.long, cave.lat], // Format [longitude, latitude]
-        division: 'caving',
-        id: cave.id,
-        source: 'iss_data',
-        // Store ISS data properties
-        sumberData: cave.sumber_data || null,
-        jenisPotensiKarst: cave.jenis_potensi_karst || null,
-        typeGua: cave.type_gua || null,
-        statusPemetaanGua: cave.status_pemetaan_gua || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform Astacala cave data (format DMS)
-    const cavingAstPoints = (cavingAstData.data || []).map(cave => {
-      const coordinates = parseDMSCoordinates(cave.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: cave.nama_gua,
-        description: cave.deskripsi || 'Tidak ada deskripsi',
-        coordinates: coordinates,
-        division: 'caving',
-        id: cave.id,
-        source: 'astacala',
-        // Store Astacala cave data properties
-        kegiatan: cave.kegiatan || null,
-        kota: cave.kota || null,
-        provinsi: cave.provinsi || null,
-        kedalaman: cave.kedalaman || null,
-        karakterLorong: cave.karakter_lorong || null,
-        waktuKegiatan: cave.waktu_kegiatan || null,
-        linkRop: cave.link_rop || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform Klapanunggal cave data (format decimal degrees)
-    const cavingKlapanunggalPoints = (cavingKlapanunggalData.data || []).map(cave => {
-      const coordinates = parseCoordinates(cave.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: cave.nama_gua,
-        description: `${cave.sinonim ? `Sinonim: ${cave.sinonim}<br>` : ''}Elevasi: ${cave.elevasi_mulut_gua || 'N/A'} m<br>Status: ${cave.status_explore || 'N/A'}`,
-        coordinates: coordinates,
-        division: 'caving',
-        id: cave.id,
-        source: 'external',
-        // Store Klapanunggal cave data properties
-        karakterLorong: cave.karakter_lorong || null,
-        totalKedalaman: cave.total_kedalaman || null,
-        totalPanjang: cave.total_panjang || null,
-        elevasiMulutGua: cave.elevasi_mulut_gua || null,
-        statusExplore: cave.status_explore || null,
-        sinonim: cave.sinonim || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform rock climbing data (format decimal dengan koma)
-    const rockClimbingPoints = (rockClimbingData.data || []).map(rc => {
-      const coordinates = parseCoordinates(rc.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: rc.nama_lokasi,
-        description: rc.deskripsi || 'Tidak ada deskripsi',
-        coordinates: coordinates,
-        division: 'panjatTebing',
-        id: rc.id,
-        source: 'astacala',
-        // Store rock climbing data properties
-        kegiatan: rc.kegiatan || null,
-        kota: rc.kota || null,
-        provinsi: rc.provinsi || null,
-        ketinggian: rc.ketinggian || null,
-        waktuKegiatan: rc.waktu_kegiatan || null,
-        linkRop: rc.link_rop || null
-      };
-    }).filter(item => item !== null);
+      // Transform rock climbing data
+      rockClimbingPoints = (rockClimbingData.data || []).map(rc => {
+        const coordinates = parseCoordinates(rc.titik_koordinat);
+        
+        if (!coordinates) return null;
+        
+        return {
+          name: rc.nama_lokasi || 'Unknown Location',
+          description: rc.deskripsi || 'Tidak ada deskripsi',
+          coordinates: coordinates,
+          division: 'panjatTebing',
+          id: rc.id,
+          source: 'astacala',
+          kegiatan: rc.kegiatan || null,
+          kota: rc.kota || null,
+          provinsi: rc.provinsi || null,
+          ketinggian: rc.ketinggian || null,
+          waktuKegiatan: rc.waktu_kegiatan || null,
+          linkRop: rc.link_rop || null
+        };
+      }).filter(item => item !== null);
+    } catch (error) {
+      console.error('Failed to fetch rock climbing data:', error.message);
+    }
     
     // Combine all caving data
     const allCavingData = [
@@ -269,40 +331,62 @@ export async function getStaticProps() {
       ...cavingKlapanunggalPoints
     ];
     
-    console.log(`Loaded data: 
-      - ISS Data: ${issDataPoints.length} points
-      - Caving Astacala: ${cavingAstPoints.length} points
-      - Caving Klapanunggal: ${cavingKlapanunggalPoints.length} points
-      - Rock Climbing: ${rockClimbingPoints.length} points
-      - Total Caving: ${allCavingData.length} points
+    console.log(`
+    Data fetch summary:
+    - ISS Data: ${issDataPoints.length} points
+    - Caving Astacala: ${cavingAstPoints.length} points
+    - Caving Klapanunggal: ${cavingKlapanunggalPoints.length} points
+    - Rock Climbing: ${rockClimbingPoints.length} points
+    - Total Caving: ${allCavingData.length} points
     `);
     
+    // Always return data, even if empty
     return {
       props: {
-        cavingData: allCavingData,  // All caving data combined
-        cavingAstPoints: cavingAstPoints,  // Keep separate for filtering
+        cavingData: allCavingData,
+        cavingAstPoints: cavingAstPoints,
         rockClimbingPoints: rockClimbingPoints,
-        issDataPoints: issDataPoints  // Keep separate for filtering
+        issDataPoints: issDataPoints,
+        // Add fetch status
+        fetchStatus: {
+          iss: issDataPoints.length > 0,
+          astacala: cavingAstPoints.length > 0,
+          klapanunggal: cavingKlapanunggalPoints.length > 0,
+          rockClimbing: rockClimbingPoints.length > 0
+        }
       },
       // Re-generate the page at most once per hour
       revalidate: 3600
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
-    // Return empty data if fetch fails
+    console.error("Critical error in getStaticProps:", error);
+    
+    // Return empty data but app will still work
     return {
       props: {
         cavingData: [],
         cavingAstPoints: [],
         rockClimbingPoints: [],
-        issDataPoints: []
+        issDataPoints: [],
+        fetchStatus: {
+          iss: false,
+          astacala: false,
+          klapanunggal: false,
+          rockClimbing: false,
+          error: error.message
+        }
       },
-      revalidate: 60 // Try again sooner if there was an error
+      revalidate: 300 // Try again in 5 minutes if there was an error
     };
   }
 }
 
-export default function MapPage({ cavingData, cavingAstPoints, rockClimbingPoints, issDataPoints }) {
+export default function MapPage({ cavingData, cavingAstPoints, rockClimbingPoints, issDataPoints, fetchStatus }) {
+  // Log fetch status in development
+  if (process.env.NODE_ENV === 'development' && fetchStatus) {
+    console.log('Data fetch status:', fetchStatus);
+  }
+  
   return (
     <>
       <Head>
