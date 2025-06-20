@@ -1,8 +1,18 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuHeight, setMenuHeight] = useState(0);
+  const menuRef = useRef(null);
+
+  // Calculate menu height for smooth animation
+  useEffect(() => {
+    if (menuRef.current) {
+      const height = menuRef.current.scrollHeight;
+      setMenuHeight(height);
+    }
+  }, []);
 
   return (
     <header className="border-b border-gray-800 bg-black sticky top-0 z-50">
@@ -93,15 +103,23 @@ export default function Header() {
 
         {/* Mobile Menu with Smooth Animation */}
         <div 
-          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
-            isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          }`}
+          className="md:hidden overflow-hidden transition-all duration-500 ease-in-out"
+          style={{ 
+            maxHeight: isMenuOpen ? `${menuHeight}px` : '0px',
+            opacity: isMenuOpen ? 1 : 0
+          }}
         >
-          <nav className="mt-4 pb-3 border-t border-gray-800 pt-4">
+          <nav 
+            ref={menuRef}
+            className="mt-4 pb-3 border-t border-gray-800 pt-4"
+          >
             <div className="flex flex-col space-y-1">
               <Link 
                 href="/" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className={`text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium transform ${
+                  isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: '50ms' }}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <div className="flex items-center gap-3">
@@ -111,7 +129,10 @@ export default function Header() {
               </Link>
               <Link 
                 href="/activities" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className={`text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium transform ${
+                  isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: '100ms' }}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <div className="flex items-center gap-3">
@@ -121,7 +142,10 @@ export default function Header() {
               </Link>
               <Link 
                 href="/rescue-history" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className={`text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium transform ${
+                  isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: '150ms' }}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <div className="flex items-center gap-3">
@@ -131,7 +155,10 @@ export default function Header() {
               </Link>
               <Link 
                 href="/about" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className={`text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium transform ${
+                  isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: '200ms' }}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <div className="flex items-center gap-3">
@@ -141,7 +168,10 @@ export default function Header() {
               </Link>
               <Link 
                 href="/contact" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className={`text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium transform ${
+                  isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                }`}
+                style={{ transitionDelay: '250ms' }}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <div className="flex items-center gap-3">
@@ -153,6 +183,16 @@ export default function Header() {
           </nav>
         </div>
       </div>
+
+      {/* CSS for smooth transitions */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          }
+        }
+      `}</style>
     </header>
   );
 }

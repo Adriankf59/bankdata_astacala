@@ -63,11 +63,11 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-300"
+            className="md:hidden p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
             aria-label="Toggle menu"
           >
             <svg 
-              className={`h-6 w-6 transition-transform duration-300 ${isMenuOpen ? 'rotate-180' : ''}`}
+              className="h-6 w-6" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -91,67 +91,48 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu with Smooth Animation */}
-        <div 
-          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
-            isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          <nav className="mt-4 pb-3 border-t border-gray-800 pt-4">
-            <div className="flex flex-col space-y-1">
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <nav className="md:hidden mt-4 pb-3 border-t border-gray-800 pt-4">
+            <div className="flex flex-col space-y-3">
               <Link 
                 href="/" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-colors duration-200 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-home w-5"></i>
-                  <span>Home</span>
-                </div>
+                Home
               </Link>
               <Link 
                 href="/activities" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-colors duration-200 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-hiking w-5"></i>
-                  <span>Activities</span>
-                </div>
+                Activities
               </Link>
               <Link 
                 href="/rescue-history" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-colors duration-200 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-life-ring w-5"></i>
-                  <span>Rescue History</span>
-                </div>
+                Rescue History
               </Link>
               <Link 
                 href="/about" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-colors duration-200 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-info-circle w-5"></i>
-                  <span>About</span>
-                </div>
+                About
               </Link>
               <Link 
                 href="/contact" 
-                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-all duration-300 font-medium"
+                className="text-gray-300 hover:text-red-500 hover:bg-gray-900 px-3 py-2 rounded-md transition-colors duration-200 font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <div className="flex items-center gap-3">
-                  <i className="fas fa-envelope w-5"></i>
-                  <span>Contact</span>
-                </div>
+                Contact
               </Link>
             </div>
           </nav>
-        </div>
+        )}
       </div>
     </header>
   );
