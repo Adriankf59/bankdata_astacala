@@ -47,13 +47,7 @@ const activities = [
     link: '/activities/paralayang',
     type: 'paralayang',
   },
-  {
-    title: 'Diksar',
-    image: '/diksar.jpg',
-    desc: 'Pendidikan Dasar Astacala adalah tahapan awal yang harus dilalui oleh calon anggota untuk menjadi anggota resmi Astacala.',
-    link: '/activities/diksar',
-    type: 'diksar',
-  },
+  
 ];
 
 const FILTERS = [
@@ -64,7 +58,6 @@ const FILTERS = [
   { label: 'Diving', value: 'diving' },
   { label: 'Conservation', value: 'conservation' },
   { label: 'Paralayang', value: 'paralayang' },
-  { label: 'Diksar', value: 'diksar' },
 ];
 
 export default function Activities() {

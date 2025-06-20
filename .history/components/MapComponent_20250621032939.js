@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+//kode 
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useRouter } from 'next/router';
 
-const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoints = [], issDataPoints = [], divingPoints = [], paralayangPoints = [] }) => {
+const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoints = [], issDataPoints = [] }) => {
   const router = useRouter();
   const mapContainerRef = useRef(null);
   const [is3D, setIs3D] = useState(false);
@@ -19,7 +19,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
     panjatTebing: true,
     paralayang: true,
     caving: true,
-    diving: true,
     astacalaOnly: false
   });
   
@@ -43,14 +42,14 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
       name: 'Gunung Parang', 
       description: 'Tebing populer untuk panjat tebing di Jawa Barat.', 
       coordinates: [107.3456, -6.7462],
-      division: 'panjatTebing', // Correction: division should be panjatTebing
+      division: 'pendaki',
       source: 'static'
     },
     { 
       name: 'Goa Jatijajar', 
       description: 'Gua indah dengan stalaktit dan stalagmit.', 
       coordinates: [109.8503, -7.7419],
-      division: 'caving', // Correction: division should be caving
+      division: 'pendaki',
       source: 'static'
     },
     { 
@@ -81,14 +80,13 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         pendaki: newValue,
         panjatTebing: newValue,
         paralayang: newValue,
-        caving: newValue,
-        diving: newValue
+        caving: newValue
       };
     } else if (division === 'astacalaOnly') {
       newFilters.astacalaOnly = !newFilters.astacalaOnly;
     } else {
       newFilters[division] = !newFilters[division];
-      newFilters.all = newFilters.pendaki && newFilters.panjatTebing && newFilters.paralayang && newFilters.caving && newFilters.diving;
+      newFilters.all = newFilters.pendaki && newFilters.panjatTebing && newFilters.paralayang && newFilters.caving;
     }
     
     setActiveFilters(newFilters);
@@ -121,10 +119,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
       divisionFilter.push(['==', ['get', 'division'], 'caving']);
     }
     
-    if (filters.diving) {
-      divisionFilter.push(['==', ['get', 'division'], 'diving']);
-    }
-    
     filterArray.push(divisionFilter);
     
     if (filters.astacalaOnly) {
@@ -149,9 +143,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
       ...cavingData,
       ...cavingAstPoints,
       ...rockClimbingPoints,
-      ...issDataPoints,
-      ...divingPoints,
-      ...paralayangPoints
+      ...issDataPoints
     ];
     
     if (!mapInstance.getSource('activities-points')) {
@@ -189,9 +181,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               jenisPotensiKarst: p.jenisPotensiKarst || null,
               typeGua: p.typeGua || null,
               statusPemetaanGua: p.statusPemetaanGua || null,
-              code: p.code || null,
-              // Paralayang fields
-              lokasi: p.lokasi || null
+              code: p.code || null
             }
           }))
         }
@@ -213,7 +203,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
             'panjatTebing', '#33ff33',
             'paralayang', '#3333ff',
             'caving', '#ffcc00',
-            'diving', '#00ccff',
             '#ff3333'
           ],
           'circle-stroke-width': 2,
@@ -232,14 +221,12 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         if (feature.properties.division === 'panjatTebing') color = '#33ff33';
         if (feature.properties.division === 'paralayang') color = '#3333ff';
         if (feature.properties.division === 'caving') color = '#ffcc00';
-        if (feature.properties.division === 'diving') color = '#00ccff';
         
         const divisionNames = {
           pendaki: 'Divisi Pendakian',
           panjatTebing: 'Divisi Panjat Tebing',
           paralayang: 'Divisi Paralayang',
-          caving: 'Divisi Caving',
-          diving: 'Divisi Diving'
+          caving: 'Divisi Caving'
         };
         
         const sourceLabels = {
@@ -257,7 +244,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         
         let popupContent = '';
         
-        if (feature.properties.division === 'diving') {
+        if (feature.properties.division === 'caving') {
           popupContent = `
             <div style="
               background: white;
@@ -269,279 +256,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               min-width: ${isMobile ? '280px' : '320px'};
               box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             ">
-              <div style="
-                background: #f8f9fa;
-                padding: ${isMobile ? '12px 16px' : '16px 20px'};
-                border-bottom: 1px solid #e9ecef;
-              ">
-                <div style="
-                  font-size: ${isMobile ? '16px' : '18px'};
-                  font-weight: 600;
-                  color: #2c3e50;
-                  margin-bottom: 4px;
-                ">${feature.properties.name}</div>
-                <div style="
-                  font-size: ${isMobile ? '12px' : '13px'};
-                  color: #6c757d;
-                  display: flex;
-                  align-items: center;
-                  gap: 4px;
-                ">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                  Lokasi Diving
-                </div>
-              </div>
-              
-              <div style="
-                display: flex;
-                gap: 8px;
-                padding: ${isMobile ? '12px 16px' : '16px 20px'};
-                border-bottom: 1px solid #e9ecef;
-              ">
-                <button style="
-                  flex: 1;
-                  padding: ${isMobile ? '8px' : '10px'};
-                  border: none;
-                  border-radius: 8px;
-                  background: #007bff;
-                  color: white;
-                  font-size: ${isMobile ? '12px' : '13px'};
-                  font-weight: 500;
-                  cursor: pointer;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 4px;
-                  transition: all 0.2s;
-                " onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${feature.geometry.coordinates[1]},${feature.geometry.coordinates[0]}', '_blank')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <path d="M3 11l19-9-9 19-2-8-8-2z"></path>
-                  </svg>
-                  Navigate
-                </button>
-                
-                <div style="
-                  flex: 1;
-                  padding: ${isMobile ? '8px' : '10px'};
-                  border-radius: 8px;
-                  background: #28a745;
-                  color: white;
-                  font-size: ${isMobile ? '12px' : '13px'};
-                  font-weight: 500;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 4px;
-                ">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  Active
-                </div>
-              </div>
-              
-              <div style="padding: ${isMobile ? '12px 16px' : '16px 20px'};">
-                <div style="
-                  font-size: ${isMobile ? '11px' : '12px'};
-                  color: #6c757d;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin-bottom: ${isMobile ? '12px' : '16px'};
-                ">Informasi Lokasi Diving</div>
-                
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                  <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">
-                    ${feature.properties.description || 'Lokasi diving yang indah'}
-                  </div>
-                </div>
-              </div>
-              
-              <div style="
-                background: #f8f9fa;
-                padding: ${isMobile ? '8px 16px' : '12px 20px'};
-                border-top: 1px solid #e9ecef;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              ">
-                <div style="
-                  font-size: ${isMobile ? '11px' : '12px'};
-                  color: #6c757d;
-                ">${sourceLabels[feature.properties.source] || 'Unknown Source'}</div>
-                <div style="
-                  background: #00ccff;
-                  color: #2c3e50;
-                  padding: 2px 8px;
-                  border-radius: 12px;
-                  font-size: ${isMobile ? '10px' : '11px'};
-                  font-weight: 600;
-                ">DIVING</div>
-              </div>
-            </div>
-          `;
-        } else if (feature.properties.division === 'paralayang') {
-          popupContent = `
-            <div style="
-              background: white;
-              color: #2c3e50;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              padding: 0;
-              border-radius: 12px;
-              overflow: hidden;
-              min-width: ${isMobile ? '280px' : '320px'};
-              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            ">
-              <div style="
-                background: #f8f9fa;
-                padding: ${isMobile ? '12px 16px' : '16px 20px'};
-                border-bottom: 1px solid #e9ecef;
-              ">
-                <div style="
-                  font-size: ${isMobile ? '16px' : '18px'};
-                  font-weight: 600;
-                  color: #2c3e50;
-                  margin-bottom: 4px;
-                ">${feature.properties.name}</div>
-                <div style="
-                  font-size: ${isMobile ? '12px' : '13px'};
-                  color: #6c757d;
-                  display: flex;
-                  align-items: center;
-                  gap: 4px;
-                ">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                  ${feature.properties.lokasi || 'Lokasi Paralayang'}
-                </div>
-              </div>
-              
-              <div style="
-                display: flex;
-                gap: 8px;
-                padding: ${isMobile ? '12px 16px' : '16px 20px'};
-                border-bottom: 1px solid #e9ecef;
-              ">
-                <button style="
-                  flex: 1;
-                  padding: ${isMobile ? '8px' : '10px'};
-                  border: none;
-                  border-radius: 8px;
-                  background: #007bff;
-                  color: white;
-                  font-size: ${isMobile ? '12px' : '13px'};
-                  font-weight: 500;
-                  cursor: pointer;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 4px;
-                  transition: all 0.2s;
-                " onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${feature.geometry.coordinates[1]},${feature.geometry.coordinates[0]}', '_blank')">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <path d="M3 11l19-9-9 19-2-8-8-2z"></path>
-                  </svg>
-                  Navigate
-                </button>
-                
-                <div style="
-                  flex: 1;
-                  padding: ${isMobile ? '8px' : '10px'};
-                  border-radius: 8px;
-                  background: #28a745;
-                  color: white;
-                  font-size: ${isMobile ? '12px' : '13px'};
-                  font-weight: 500;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  gap: 4px;
-                ">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  Active
-                </div>
-              </div>
-              
-              <div style="padding: ${isMobile ? '12px 16px' : '16px 20px'};">
-                <div style="
-                  font-size: ${isMobile ? '11px' : '12px'};
-                  color: #6c757d;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin-bottom: ${isMobile ? '12px' : '16px'};
-                ">Informasi Lokasi Paralayang</div>
-                
-                ${feature.properties.lokasi ? `
-                <div style="margin-bottom: ${isMobile ? '12px' : '16px'};">
-                  <div style="display: flex; align-items: start; gap: 12px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    <div style="flex: 1;">
-                      <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d; margin-bottom: 2px;">Alamat Lengkap</div>
-                      <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">${feature.properties.lokasi}</div>
-                    </div>
-                  </div>
-                </div>
-                ` : ''}
-                
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2">
-                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                  </svg>
-                  <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">
-                    Koordinat: ${feature.geometry.coordinates[1].toFixed(6)}, ${feature.geometry.coordinates[0].toFixed(6)}
-                  </div>
-                </div>
-              </div>
-              
-              <div style="
-                background: #f8f9fa;
-                padding: ${isMobile ? '8px 16px' : '12px 20px'};
-                border-top: 1px solid #e9ecef;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              ">
-                <div style="
-                  font-size: ${isMobile ? '11px' : '12px'};
-                  color: #6c757d;
-                ">${sourceLabels[feature.properties.source] || 'Unknown Source'}</div>
-                <div style="
-                  background: #3333ff;
-                  color: white;
-                  padding: 2px 8px;
-                  border-radius: 12px;
-                  font-size: ${isMobile ? '10px' : '11px'};
-                  font-weight: 600;
-                ">PARALAYANG</div>
-              </div>
-            </div>
-          `;
-        } else if (feature.properties.division === 'caving') {
-          popupContent = `
-            <div style="
-              background: white;
-              color: #2c3e50;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              padding: 0;
-              border-radius: 12px;
-              overflow: hidden;
-              min-width: ${isMobile ? '280px' : '320px'};
-              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            ">
+              <!-- Header -->
               <div style="
                 background: #f8f9fa;
                 padding: ${isMobile ? '12px 16px' : '16px 20px'};
@@ -568,6 +283,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 </div>
               </div>
               
+              <!-- Action Buttons -->
               <div style="
                 display: flex;
                 gap: 8px;
@@ -647,6 +363,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 </div>
               </div>
               
+              <!-- Details Section -->
               <div style="padding: ${isMobile ? '12px 16px' : '16px 20px'};">
                 <div style="
                   font-size: ${isMobile ? '11px' : '12px'};
@@ -655,196 +372,197 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                   letter-spacing: 0.5px;
                   margin-bottom: ${isMobile ? '12px' : '16px'};
                 ">Informasi Gua</div>`;
-
-                // ISS Data specific fields
-                if (feature.properties.source === 'iss_data') {
-                    if (feature.properties.description) {
-                    popupContent += `
-                        <div style="margin-bottom: ${isMobile ? '12px' : '16px'};">
-                        <div style="display: flex; align-items: start; gap: 12px;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                            </svg>
-                            <div style="flex: 1;">
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d; margin-bottom: 2px;">Deskripsi</div>
-                            <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">${feature.properties.description}</div>
-                            </div>
-                        </div>
-                        </div>`;
-                    }
-                    
-                    popupContent += `
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: ${isMobile ? '12px' : '16px'};">
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                        </svg>
-                        <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Sumber</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.sumberData || '-'}</div>
-                        </div>
-                        </div>
-                        
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Jenis</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.jenisPotensiKarst || '-'}</div>
-                        </div>
-                        </div>
-                    </div>`;
-                }
-                
-                // Astacala caving specific fields
-                else if (feature.properties.source === 'astacala') {
-                    popupContent += `
-                    <div style="display: flex; flex-direction: column; gap: ${isMobile ? '12px' : '16px'};">
-                        ${feature.properties.kegiatan ? `
-                        <div style="display: flex; align-items: start; gap: 12px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        <div style="flex: 1;">
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d; margin-bottom: 2px;">Kegiatan</div>
-                            <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">${feature.properties.kegiatan}</div>
-                        </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: ${isMobile ? '12px' : '16px'};">
-                        ${feature.properties.kedalaman ? `
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                            <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Kedalaman</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.kedalaman} m</div>
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        ${feature.properties.karakterLorong ? `
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Karakter</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.karakterLorong}</div>
-                            </div>
-                        </div>
-                        ` : ''}
-                        </div>
-                        
-                        ${feature.properties.waktuKegiatan ? `
-                        <div style="display: flex; align-items: center; gap: 10px; padding-top: 8px; border-top: 1px solid #e9ecef;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d;">${feature.properties.waktuKegiatan}</div>
-                        </div>
-                        ` : ''}
-                    </div>`;
-                }
-                
-                // Klapanunggal/External specific fields
-                else if (feature.properties.source === 'external') {
-                    popupContent += `
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: ${isMobile ? '12px' : '16px'};">
-                        ${feature.properties.elevasiMulutGua ? `
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                        <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Elevasi</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.elevasiMulutGua} m</div>
-                        </div>
-                        </div>
-                        ` : ''}
-                        
-                        ${feature.properties.totalKedalaman ? `
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                        </svg>
-                        <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Kedalaman</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.totalKedalaman} m</div>
-                        </div>
-                        </div>
-                        ` : ''}
-                        
-                        ${feature.properties.totalPanjang ? `
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <path d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                        </svg>
-                        <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Panjang</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.totalPanjang} m</div>
-                        </div>
-                        </div>
-                        ` : ''}
-                        
-                        ${feature.properties.statusExplore ? `
-                        <div style="display: flex; align-items: start; gap: 10px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
-                            <path d="M12 6v6l4 2"></path>
-                        </svg>
-                        <div>
-                            <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Status</div>
-                            <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.statusExplore}</div>
-                        </div>
-                        </div>
-                        ` : ''}
+          
+          // ISS Data specific fields
+          if (feature.properties.source === 'iss_data') {
+            if (feature.properties.description) {
+              popupContent += `
+                <div style="margin-bottom: ${isMobile ? '12px' : '16px'};">
+                  <div style="display: flex; align-items: start; gap: 12px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                    <div style="flex: 1;">
+                      <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d; margin-bottom: 2px;">Deskripsi</div>
+                      <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">${feature.properties.description}</div>
                     </div>
-                    
-                    ${feature.properties.sinonim ? `
-                    <div style="margin-top: ${isMobile ? '12px' : '16px'}; padding-top: ${isMobile ? '12px' : '16px'}; border-top: 1px solid #e9ecef;">
-                        <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d; margin-bottom: 4px;">Nama Lain</div>
-                        <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50; font-style: italic;">${feature.properties.sinonim}</div>
-                    </div>
-                    ` : ''}
-                    `;
-                }
-
-                popupContent += `
                   </div>
-                  
-                  <div style="
-                    background: #f8f9fa;
-                    padding: ${isMobile ? '8px 16px' : '12px 20px'};
-                    border-top: 1px solid #e9ecef;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  ">
-                    <div style="
-                      font-size: ${isMobile ? '11px' : '12px'};
-                      color: #6c757d;
-                    ">${sourceLabels[feature.properties.source] || 'Unknown Source'}</div>
-                    <div style="
-                      background: #ffcc00;
-                      color: #2c3e50;
-                      padding: 2px 8px;
-                      border-radius: 12px;
-                      font-size: ${isMobile ? '10px' : '11px'};
-                      font-weight: 600;
-                    ">CAVING</div>
+                </div>`;
+            }
+            
+            popupContent += `
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: ${isMobile ? '12px' : '16px'};">
+                <div style="display: flex; align-items: start; gap: 10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                  </svg>
+                  <div>
+                    <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Sumber</div>
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.sumberData || '-'}</div>
                   </div>
                 </div>
-              `;
+                
+                <div style="display: flex; align-items: start; gap: 10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <div>
+                    <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Jenis</div>
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.jenisPotensiKarst || '-'}</div>
+                  </div>
+                </div>
+              </div>`;
+          }
+          
+          // Astacala caving specific fields
+          else if (feature.properties.source === 'astacala') {
+            popupContent += `
+              <div style="display: flex; flex-direction: column; gap: ${isMobile ? '12px' : '16px'};">
+                ${feature.properties.kegiatan ? `
+                <div style="display: flex; align-items: start; gap: 12px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <div style="flex: 1;">
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d; margin-bottom: 2px;">Kegiatan</div>
+                    <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50;">${feature.properties.kegiatan}</div>
+                  </div>
+                </div>
+                ` : ''}
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: ${isMobile ? '12px' : '16px'};">
+                  ${feature.properties.kedalaman ? `
+                  <div style="display: flex; align-items: start; gap: 10px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <div>
+                      <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Kedalaman</div>
+                      <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.kedalaman} m</div>
+                    </div>
+                  </div>
+                  ` : ''}
+                  
+                  ${feature.properties.karakterLorong ? `
+                  <div style="display: flex; align-items: start; gap: 10px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <div>
+                      <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Karakter</div>
+                      <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.karakterLorong}</div>
+                    </div>
+                  </div>
+                  ` : ''}
+                </div>
+                
+                ${feature.properties.waktuKegiatan ? `
+                <div style="display: flex; align-items: center; gap: 10px; padding-top: 8px; border-top: 1px solid #e9ecef;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #6c757d;">${feature.properties.waktuKegiatan}</div>
+                </div>
+                ` : ''}
+              </div>`;
+          }
+          
+          // Klapanunggal/External specific fields
+          else if (feature.properties.source === 'external') {
+            popupContent += `
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: ${isMobile ? '12px' : '16px'};">
+                ${feature.properties.elevasiMulutGua ? `
+                <div style="display: flex; align-items: start; gap: 10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                  <div>
+                    <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Elevasi</div>
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.elevasiMulutGua} m</div>
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${feature.properties.totalKedalaman ? `
+                <div style="display: flex; align-items: start; gap: 10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  <div>
+                    <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Kedalaman</div>
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.totalKedalaman} m</div>
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${feature.properties.totalPanjang ? `
+                <div style="display: flex; align-items: start; gap: 10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <path d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                  </svg>
+                  <div>
+                    <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Panjang</div>
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.totalPanjang} m</div>
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${feature.properties.statusExplore ? `
+                <div style="display: flex; align-items: start; gap: 10px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                    <path d="M12 6v6l4 2"></path>
+                  </svg>
+                  <div>
+                    <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d;">Status</div>
+                    <div style="font-size: ${isMobile ? '12px' : '13px'}; color: #2c3e50; font-weight: 500;">${feature.properties.statusExplore}</div>
+                  </div>
+                </div>
+                ` : ''}
+              </div>
+              
+              ${feature.properties.sinonim ? `
+              <div style="margin-top: ${isMobile ? '12px' : '16px'}; padding-top: ${isMobile ? '12px' : '16px'}; border-top: 1px solid #e9ecef;">
+                <div style="font-size: ${isMobile ? '11px' : '12px'}; color: #6c757d; margin-bottom: 4px;">Nama Lain</div>
+                <div style="font-size: ${isMobile ? '13px' : '14px'}; color: #2c3e50; font-style: italic;">${feature.properties.sinonim}</div>
+              </div>
+              ` : ''}
+            `;
+          }
+          
+          popupContent += `
+              </div>
+              
+              <!-- Source Badge -->
+              <div style="
+                background: #f8f9fa;
+                padding: ${isMobile ? '8px 16px' : '12px 20px'};
+                border-top: 1px solid #e9ecef;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              ">
+                <div style="
+                  font-size: ${isMobile ? '11px' : '12px'};
+                  color: #6c757d;
+                ">${sourceLabels[feature.properties.source] || 'Unknown Source'}</div>
+                <div style="
+                  background: #ffcc00;
+                  color: #2c3e50;
+                  padding: 2px 8px;
+                  border-radius: 12px;
+                  font-size: ${isMobile ? '10px' : '11px'};
+                  font-weight: 600;
+                ">CAVING</div>
+              </div>
+            </div>
+          `;
         } else if (feature.properties.division === 'panjatTebing') {
           popupContent = `
             <div style="
@@ -857,6 +575,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               min-width: ${isMobile ? '280px' : '320px'};
               box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             ">
+              <!-- Header -->
               <div style="
                 background: #f8f9fa;
                 padding: ${isMobile ? '12px 16px' : '16px 20px'};
@@ -883,6 +602,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 </div>
               </div>
               
+              <!-- Action Buttons -->
               <div style="
                 display: flex;
                 gap: 8px;
@@ -960,6 +680,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 </div>
               </div>
               
+              <!-- Details Section -->
               <div style="padding: ${isMobile ? '12px 16px' : '16px 20px'};">
                 <div style="
                   font-size: ${isMobile ? '11px' : '12px'};
@@ -1037,6 +758,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 ` : ''}
               </div>
               
+              <!-- Source Badge -->
               <div style="
                 background: #f8f9fa;
                 padding: ${isMobile ? '8px 16px' : '12px 20px'};
@@ -1061,35 +783,35 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
             </div>
           `;
         } else {
-            // Default popup for other divisions (pendaki, etc.)
-            popupContent = `
+          // Default popup for other divisions
+          popupContent = `
             <div style="
-                background: white;
-                color: #2c3e50;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                padding: ${isMobile ? '16px' : '20px'};
-                border-radius: 12px;
-                min-width: ${isMobile ? '200px' : '250px'};
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+              background: white;
+              color: #2c3e50;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              padding: ${isMobile ? '16px' : '20px'};
+              border-radius: 12px;
+              min-width: ${isMobile ? '200px' : '250px'};
+              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             ">
-                <div style="
+              <div style="
                 font-size: ${isMobile ? '16px' : '18px'};
                 font-weight: 600;
                 color: #2c3e50;
                 margin-bottom: 8px;
-                ">${feature.properties.name}</div>
-                <div style="
+              ">${feature.properties.name}</div>
+              <div style="
                 font-size: ${isMobile ? '12px' : '13px'};
                 color: #6c757d;
                 margin-bottom: 12px;
-                ">${divisionNames[feature.properties.division]}</div>
-                <div style="
+              ">${divisionNames[feature.properties.division]}</div>
+              <div style="
                 font-size: ${isMobile ? '13px' : '14px'};
                 color: #495057;
                 line-height: 1.5;
-                ">${feature.properties.description}</div>
+              ">${feature.properties.description}</div>
             </div>
-            `;
+          `;
         }
         
         const popup = new maplibregl.Popup({
@@ -1135,14 +857,12 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
             jenisPotensiKarst: p.jenisPotensiKarst || null,
             typeGua: p.typeGua || null,
             statusPemetaanGua: p.statusPemetaanGua || null,
-            code: p.code || null,
-            // Paralayang fields
-            lokasi: p.lokasi || null
+            code: p.code || null
           }
         }))
       });
     }
-  }; // END of addActivityPoints function
+  };
 
   // Toggle 3D terrain
   const toggle3D = () => {
@@ -1406,24 +1126,6 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
           transform: translateY(0);
         }
 
-        /* Modern scrollbar for popup content */
-        .maplibregl-popup-content *::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .maplibregl-popup-content *::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-
-        .maplibregl-popup-content *::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 2px;
-        }
-
-        .maplibregl-popup-content *::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-
         /* Smooth transitions */
         .maplibregl-popup {
           animation: popupFadeIn 0.2s ease-out;
@@ -1452,8 +1154,17 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
         }
       `}</style>
       
-      {/* Map Container */}
-      <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+      {/* The map container */}
+      <div 
+        ref={mapContainerRef} 
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%'
+        }} 
+      />
       
       {/* Left side tools panel */}
       <div style={{
@@ -1543,8 +1254,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
               { key: 'pendaki', label: 'Divisi Pendakian', color: '#ff3333' },
               { key: 'panjatTebing', label: 'Divisi Panjat Tebing', color: '#33ff33' },
               { key: 'paralayang', label: 'Divisi Paralayang', color: '#3333ff' },
-              { key: 'caving', label: 'Divisi Caving', color: '#ffcc00' },
-              { key: 'diving', label: 'Divisi Diving', color: '#00ccff' }
+              { key: 'caving', label: 'Divisi Caving', color: '#ffcc00' }
             ].map((item) => (
               <label 
                 key={item.key}
@@ -1855,8 +1565,7 @@ const MapComponent = ({ cavingData = [], cavingAstPoints = [], rockClimbingPoint
                 { color: '#ff3333', label: 'Divisi Pendakian' },
                 { color: '#33ff33', label: 'Divisi Panjat Tebing' },
                 { color: '#3333ff', label: 'Divisi Paralayang' },
-                { color: '#ffcc00', label: 'Divisi Caving' },
-                { color: '#00ccff', label: 'Divisi Diving' }
+                { color: '#ffcc00', label: 'Divisi Caving' }
               ].map((item) => (
                 <div 
                   key={item.label}

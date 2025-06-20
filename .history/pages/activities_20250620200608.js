@@ -64,7 +64,6 @@ const FILTERS = [
   { label: 'Diving', value: 'diving' },
   { label: 'Conservation', value: 'conservation' },
   { label: 'Paralayang', value: 'paralayang' },
-  { label: 'Diksar', value: 'diksar' },
 ];
 
 export default function Activities() {

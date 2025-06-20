@@ -7,86 +7,119 @@ import { useState, useMemo } from 'react';
 
 const activitiesData = {
   'rock-climbing': {
-    title: 'Rock Climbing',
-    image: '/rc.jpg',
-    description: "Explore the heights of Astacala's mountains with our Rock Climbing Division. Learn about safe climbing techniques, equipment, and join our thrilling expeditions.",
-    features: [
-      { icon: 'fas fa-book', label: 'Climbing Techniques' },
-      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
-      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
-    ],
-  },
-  caving: {
-    title: 'Caving Division',
-    image: '/caving.jpg',
-    description: "Explore the depths of Astacala's caves with our Caving Division. Learn about safe caving techniques, equipment, and join our thrilling expeditions.",
-    features: [
-      { icon: 'fas fa-book', label: 'Caving Techniques' },
-      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
-      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
-    ],
-  },
-  rafting: {
-    title: 'Rafting Division',
-    image: '/rafting.jpg',
-    description: "Explore the rapids of Astacala's rivers with our Rafting Division. Learn about safe rafting techniques, equipment, and join our thrilling expeditions.",
-    features: [
-      { icon: 'fas fa-book', label: 'Rafting Techniques' },
-      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
-      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
-    ],
-  },
-  diving: {
-    title: 'Diving Division',
-    image: '/diving.jpg',
-    description: "Explore the depths of Astacala's oceans with our Diving Division. Learn about safe diving techniques, equipment, and join our thrilling expeditions.",
-    features: [
-      { icon: 'fas fa-book', label: 'Diving Techniques' },
-      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
-      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
-    ],
-  },
-  conservation: {
-    title: 'Conservation Division',
-    image: '/conservation.jpg',
-    description: "Join our Conservation Division in preserving and protecting Astacala's environment and wildlife.",
-    features: [
-      { icon: 'fas fa-book', label: 'Conservation Techniques' },
-      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
-      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
-    ],
-    table: {
-      columns: [
-        { key: 'name', label: 'Location Name' },
-        { key: 'region', label: 'Region' },
-        { key: 'accessibility', label: 'Accessibility' },
-      ],
-      rows: [
-        { name: 'Taman Nasional Ujung Kulon', region: 'Southern Range', accessibility: 'Moderate' },
-        { name: 'Taman Nasional Gunung Leuser', region: 'Western Highlands', accessibility: 'Challenging' },
-      ],
-    },
-  },
-  paralayang: {
-    title: 'Paralayang Division',
-    image: '/paralayang.jpg',
-    description: "Explore the skies of Astacala with our Paralayang Division. Learn about safe paragliding techniques, equipment, and join our thrilling expeditions.",
-    features: [
-      { icon: 'fas fa-book', label: 'Paragliding Techniques' },
-      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
-      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
-    ],
-  },
-  diksar: {
-    title: 'Diksar (Pendidikan Dasar)',
-    image: '/diksar.jpg',
-    description: "Pendidikan Dasar Astacala adalah tahapan awal yang harus dilalui oleh calon anggota Astacala untuk menjadi anggota. Di sini calon anggota akan dilatih keterampilan alam terbuka, dipupuk rasa nasionalisme, digalang suatu persatuan dan semangat kebersamaan, dibina mental dan fisik.",
-    features: [
-      { icon: 'fas fa-campground', label: 'Keterampilan Alam Terbuka' },
-      { icon: 'fas fa-users', label: 'Pembinaan Mental & Fisik' },
-      { icon: 'fas fa-flag', label: 'Semangat Nasionalisme' },
-    ],
-  },
+    title: 'Rock Climbing',
+    image: '/rc.jpg',
+    description: "Explore the heights of Astacala's mountains with our Rock Climbing Division. Learn about safe climbing techniques, equipment, and join our thrilling expeditions.",
+    features: [
+      { icon: 'fas fa-book', label: 'Climbing Techniques' },
+      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
+      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
+    ],
+  },
+  caving: {
+    title: 'Caving Division',
+    image: '/caving.jpg',
+    description: "Explore the depths of Astacala's caves with our Caving Division. Learn about safe caving techniques, equipment, and join our thrilling expeditions.",
+    features: [
+      { icon: 'fas fa-book', label: 'Caving Techniques' },
+      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
+      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
+    ],
+  },
+  rafting: {
+    title: 'Rafting Division',
+    image: '/rafting.jpg',
+    description: "Explore the rapids of Astacala's rivers with our Rafting Division. Learn about safe rafting techniques, equipment, and join our thrilling expeditions.",
+    features: [
+      { icon: 'fas fa-book', label: 'Rafting Techniques' },
+      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
+      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
+    ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Sungai Elo', region: 'Southern Range', accessibility: 'Moderate' },
+        { name: 'Sungai Progo', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
+  },
+  diving: {
+    title: 'Diving Division',
+    image: '/diving.jpg',
+    description: "Explore the depths of Astacala's oceans with our Diving Division. Learn about safe diving techniques, equipment, and join our thrilling expeditions.",
+    features: [
+      { icon: 'fas fa-book', label: 'Diving Techniques' },
+      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
+      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
+    ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Bunaken', region: 'Northern Range', accessibility: 'Moderate' },
+        { name: 'Raja Ampat', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
+  },
+  conservation: {
+    title: 'Conservation Division',
+    image: '/conservation.jpg',
+    description: "Join our Conservation Division in preserving and protecting Astacala's environment and wildlife.",
+    features: [
+      { icon: 'fas fa-book', label: 'Conservation Techniques' },
+      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
+      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
+    ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Taman Nasional Ujung Kulon', region: 'Southern Range', accessibility: 'Moderate' },
+        { name: 'Taman Nasional Gunung Leuser', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
+  },
+  paralayang: {
+    title: 'Paralayang Division',
+    image: '/paralayang.jpg',
+    description: "Explore the skies of Astacala with our Paralayang Division. Learn about safe paragliding techniques, equipment, and join our thrilling expeditions.",
+    features: [
+      { icon: 'fas fa-book', label: 'Paragliding Techniques' },
+      { icon: 'fas fa-tools', label: 'Equipment Essentials' },
+      { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
+    ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Gunung Banyak', region: 'Southern Range', accessibility: 'Moderate' },
+        { name: 'Puncak Lawang', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
+  },
+  diksar: {
+    title: 'Diksar (Pendidikan Dasar)',
+    image: '/diksar.jpg',
+    description: "Pendidikan Dasar Astacala adalah tahapan awal yang harus dilalui oleh calon anggota Astacala untuk menjadi anggota. Di sini calon anggota akan dilatih keterampilan alam terbuka, dipupuk rasa nasionalisme, digalang suatu persatuan dan semangat kebersamaan, dibina mental dan fisik.",
+    features: [
+      { icon: 'fas fa-campground', label: 'Keterampilan Alam Terbuka' },
+      { icon: 'fas fa-users', label: 'Pembinaan Mental & Fisik' },
+      { icon: 'fas fa-flag', label: 'Semangat Nasionalisme' },
+    ],
+  },
 };
 
 // Komponen Tabel Modern
@@ -101,7 +134,7 @@ function ModernTable({ columns, data }) {
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
     
-    return data.filter(row =>
+    return data.filter(row => 
       columns.some(col => {
         const value = row[col.key];
         return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase());
@@ -175,7 +208,7 @@ function ModernTable({ columns, data }) {
             <thead>
               <tr className="bg-gradient-to-r from-red-600 to-red-700">
                 {columns.map((col) => (
-                  <th
+                  <th 
                     key={col.key}
                     className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer hover:bg-red-800/50 transition-colors"
                     onClick={() => handleSort(col.key)}
@@ -195,14 +228,14 @@ function ModernTable({ columns, data }) {
             <tbody className="divide-y divide-gray-700">
               {paginatedData.length > 0 ? (
                 paginatedData.map((row, idx) => (
-                  <tr
-                    key={idx}
+                  <tr 
+                    key={idx} 
                     className="hover:bg-gray-700/50 transition-all duration-200 hover:transform hover:scale-[1.01]"
                   >
                     {columns.map((col) => (
                       <td key={col.key} className="px-6 py-4 text-sm text-gray-300">
                         {col.key === 'peta_sungai' && row.jalur_orad && row.point_orad ? (
-                          <Link
+                          <Link 
                             href={`/activities/rafting/river-map?jalur=${row.jalur_orad}&point=${row.point_orad}&nama=${encodeURIComponent(row.nama_kegiatan)}&sungai=${encodeURIComponent(row.sungai || '')}`}
                             className="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors"
                           >
@@ -210,7 +243,7 @@ function ModernTable({ columns, data }) {
                             <span className="text-xs font-medium">Lihat Peta Sungai</span>
                           </Link>
                         ) : col.key === 'peta_pda' && row.jalur_pda && row.point_pda ? (
-                          <Link
+                          <Link 
                             href={`/activities/diksar/pda-map?jalur=${row.jalur_pda}&point=${row.point_pda}&nama=${encodeURIComponent(row.nama_kegiatan)}`}
                             className="inline-flex items-center px-3 py-1 bg-red-600/20 text-red-400 rounded-full hover:bg-red-600/30 transition-colors"
                           >
@@ -218,7 +251,7 @@ function ModernTable({ columns, data }) {
                             <span className="text-xs font-medium">Lihat Peta PDA</span>
                           </Link>
                         ) : col.key === 'link_rop' && row[col.key] ? (
-                          <a
+                          <a 
                             href={row[col.key]}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -227,7 +260,7 @@ function ModernTable({ columns, data }) {
                             <i className="fas fa-external-link-alt mr-1 text-xs"></i>
                             <span className="text-xs font-medium">ROP</span>
                           </a>
-                        ) : (col.key === 'tempat' || col.key === 'tanggal_kegiatan' || col.key === 'lokasi') && row[col.key] && row[col.key].length > 50 ? (
+                        ) : (col.key === 'tempat' || col.key === 'tanggal_kegiatan') && row[col.key] && row[col.key].length > 50 ? (
                           <div className="relative">
                             <div className={`${!expandedDescriptions[idx] ? 'max-w-[300px] truncate' : ''}`}>
                               {row[col.key]}
@@ -315,8 +348,8 @@ function ModernTable({ columns, data }) {
                         key={idx}
                         onClick={() => goToPage(pageNum)}
                         className={`min-w-[40px] px-3 py-2 rounded-lg font-medium transition-all ${
-                          currentPage === pageNum
-                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                          currentPage === pageNum 
+                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                             : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
                         }`}
                       >
@@ -350,7 +383,7 @@ function ModernTable({ columns, data }) {
   );
 }
 
-export default function ActivityDetail({ type, astacalaData, externalData, issData, pdaData, oradData, divingData, paralayangData }) {
+export default function ActivityDetail({ type, astacalaData, externalData, issData, pdaData, oradData }) {
   const router = useRouter();
   const [dataSource, setDataSource] = useState('astacala');
   
@@ -488,29 +521,6 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
     };
   }
 
-  // Create table data for diving based on API data
-  if (type === 'diving' && divingData && divingData.data && divingData.data.length > 0) {
-    activity.table = {
-      columns: [
-        { key: 'lokasi', label: 'Nama Lokasi' },
-        { key: 'titik_koordinat', label: 'Koordinat' },
-      ],
-      rows: divingData.data
-    };
-  }
-
-  // Create table data for paralayang based on API data
-  if (type === 'paralayang' && paralayangData && paralayangData.data && paralayangData.data.length > 0) {
-    activity.table = {
-      columns: [
-        { key: 'nama_tempat', label: 'Nama Tempat' },
-        { key: 'lokasi', label: 'Lokasi' },
-        { key: 'titik_koordinat', label: 'Koordinat' },
-      ],
-      rows: paralayangData.data
-    };
-  }
-
   return (
     <>
       <Head>
@@ -532,8 +542,8 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
 
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-8 relative z-10">
           {/* Back Button */}
-          <Link
-            href="/activities"
+          <Link 
+            href="/activities" 
             className="inline-flex items-center text-gray-400 hover:text-white mb-4 transition-colors group"
           >
             <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -544,9 +554,9 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
 
           {/* Main Card - Responsive */}
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg flex flex-col lg:flex-row p-4 sm:p-6 gap-4 sm:gap-6 items-center mb-6 border border-gray-800 transform hover:shadow-red-900/20 transition-all duration-300">
-            <img
-              src={activity.image}
-              alt={activity.title}
+            <img 
+              src={activity.image} 
+              alt={activity.title} 
               className="w-full lg:w-48 h-48 lg:h-36 object-cover rounded-lg shadow-md"
               loading="lazy"
             />
@@ -563,7 +573,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 <div className="bg-red-600 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-xl sm:text-2xl mb-2 transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <i className={f.icon}></i>
                 </div>
-                <Link
+                <Link 
                   href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`}
                   className="font-semibold text-red-500 hover:text-red-400 text-center text-sm sm:text-base transition-colors"
                 >
@@ -578,33 +588,33 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
             <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 border border-gray-800">
               <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-500">Sumber Data</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                <button
+                <button 
                   onClick={() => setDataSource('astacala')}
                   className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'astacala'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    dataSource === 'astacala' 
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
                   <i className="fas fa-mountain mr-2"></i>
                   Data Kegiatan Astacala
                 </button>
-                <button
+                <button 
                   onClick={() => setDataSource('external')}
                   className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'external'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    dataSource === 'external' 
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
                   <i className="fas fa-database mr-2"></i>
                   Data Klapanunggal
                 </button>
-                <button
+                <button 
                   onClick={() => setDataSource('iss')}
                   className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'iss'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    dataSource === 'iss' 
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
@@ -619,22 +629,18 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 border border-gray-800">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
               <h2 className="text-lg sm:text-xl font-bold text-red-500">
-                {type === 'caving'
+                {type === 'caving' 
                   ? (dataSource === 'astacala' ? 'Data Kegiatan Astacala' : dataSource === 'external' ? 'Data Klapanunggal' : 'Data Karst Umum (ISS)')
-                  : type === 'diksar'
+                  : type === 'diksar' 
                   ? 'Data Kegiatan Pendidikan Dasar (PDA)'
                   : type === 'rafting'
                   ? 'Data Kegiatan Olahraga Arus Deras (ORAD)'
-                  : type === 'diving'
-                  ? 'Lokasi Diving'
-                  : type === 'paralayang'
-                  ? 'Lokasi Paralayang'
                   : 'Lokasi Kegiatan'
                 }
               </h2>
               {activity.table && activity.table.rows && (
                 <div className="flex items-center space-x-2">
-                  <i className={`fas ${type === 'diksar' ? 'fa-graduation-cap' : type === 'rafting' ? 'fa-water' : type === 'diving' ? 'fa-fish' : type === 'paralayang' ? 'fa-parachute-box' : 'fa-chart-bar'} text-red-500`}></i>
+                  <i className={`fas ${type === 'diksar' ? 'fa-graduation-cap' : type === 'rafting' ? 'fa-water' : 'fa-chart-bar'} text-red-500`}></i>
                   <span className="text-sm text-gray-400">
                     Total: {activity.table.rows.length} {type === 'diksar' ? 'kegiatan' : type === 'rafting' ? 'kegiatan ORAD' : 'lokasi'}
                   </span>
@@ -644,17 +650,17 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
             
             {/* BAGIAN YANG DIPERBAIKI */}
             {activity.table && activity.table.rows ? (
-              <ModernTable
+              <ModernTable 
                 columns={activity.table.columns}
                 data={activity.table.rows}
               />
             ) : (
               <div className="text-center py-12">
                 <div className="text-5xl mb-4 opacity-20">
-                  <i className={`fas ${type === 'diksar' ? 'fa-graduation-cap' : type === 'rafting' ? 'fa-water' : type === 'diving' ? 'fa-fish' : type === 'paralayang' ? 'fa-parachute-box' : 'fa-map-marked-alt'}`}></i>
+                  <i className={`fas ${type === 'diksar' ? 'fa-graduation-cap' : type === 'rafting' ? 'fa-water' : 'fa-map-marked-alt'}`}></i>
                 </div>
                 <p className="text-gray-400 text-lg">
-                  {type === 'diksar' ? 'Belum ada data kegiatan PDA' : type === 'rafting' ? 'Belum ada data kegiatan ORAD' : type === 'diving' ? 'Belum ada data lokasi diving' : type === 'paralayang' ? 'Belum ada data lokasi paralayang' : 'No location data available'}
+                  {type === 'diksar' ? 'Belum ada data kegiatan PDA' : type === 'rafting' ? 'Belum ada data kegiatan ORAD' : 'No location data available'}
                 </p>
                 <p className="text-gray-500 text-sm mt-2">Check back later for updates</p>
               </div>
@@ -728,8 +734,6 @@ export async function getStaticProps({ params }) {
   let issData = null;
   let pdaData = null;
   let oradData = null;
-  let divingData = null;
-  let paralayangData = null;
   
   const baseURL = 'http://52.64.175.183';
   
@@ -775,26 +779,6 @@ export async function getStaticProps({ params }) {
     }
   }
   
-  // Fetch diving data
-  if (type === 'diving') {
-    try {
-      const divingRes = await fetch(`${baseURL}/items/diving_astacala?limit=-1`);
-      divingData = await divingRes.json();
-    } catch (error) {
-      console.error('Failed to fetch diving data:', error);
-    }
-  }
-  
-  // Fetch paralayang data
-  if (type === 'paralayang') {
-    try {
-      const paralayangRes = await fetch(`${baseURL}/items/paralayang_astacala?limit=-1`);
-      paralayangData = await paralayangRes.json();
-    } catch (error) {
-      console.error('Failed to fetch paralayang data:', error);
-    }
-  }
-  
   const processData = (data) => {
     if (!data || !data.data) return null;
     return {
@@ -806,16 +790,14 @@ export async function getStaticProps({ params }) {
     };
   };
   
-  return {
-    props: {
+  return { 
+    props: { 
       type,
       astacalaData: processData(astacalaData),
       externalData: processData(externalData),
       issData: processData(issData),
       pdaData: processData(pdaData),
-      oradData: processData(oradData),
-      divingData: processData(divingData),
-      paralayangData: processData(paralayangData)
+      oradData: processData(oradData)
     },
     revalidate: 3600,
   };

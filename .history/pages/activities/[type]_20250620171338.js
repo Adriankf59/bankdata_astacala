@@ -35,6 +35,17 @@ const activitiesData = {
       { icon: 'fas fa-tools', label: 'Equipment Essentials' },
       { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
     ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Sungai Elo', region: 'Southern Range', accessibility: 'Moderate' },
+        { name: 'Sungai Progo', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
   },
   diving: {
     title: 'Diving Division',
@@ -45,6 +56,17 @@ const activitiesData = {
       { icon: 'fas fa-tools', label: 'Equipment Essentials' },
       { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
     ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Bunaken', region: 'Northern Range', accessibility: 'Moderate' },
+        { name: 'Raja Ampat', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
   },
   conservation: {
     title: 'Conservation Division',
@@ -76,20 +98,21 @@ const activitiesData = {
       { icon: 'fas fa-tools', label: 'Equipment Essentials' },
       { icon: 'fas fa-shield-alt', label: 'Safety Protocols' },
     ],
-  },
-  diksar: {
-    title: 'Diksar (Pendidikan Dasar)',
-    image: '/diksar.jpg',
-    description: "Pendidikan Dasar Astacala adalah tahapan awal yang harus dilalui oleh calon anggota Astacala untuk menjadi anggota. Di sini calon anggota akan dilatih keterampilan alam terbuka, dipupuk rasa nasionalisme, digalang suatu persatuan dan semangat kebersamaan, dibina mental dan fisik.",
-    features: [
-      { icon: 'fas fa-campground', label: 'Keterampilan Alam Terbuka' },
-      { icon: 'fas fa-users', label: 'Pembinaan Mental & Fisik' },
-      { icon: 'fas fa-flag', label: 'Semangat Nasionalisme' },
-    ],
+    table: {
+      columns: [
+        { key: 'name', label: 'Location Name' },
+        { key: 'region', label: 'Region' },
+        { key: 'accessibility', label: 'Accessibility' },
+      ],
+      rows: [
+        { name: 'Gunung Banyak', region: 'Southern Range', accessibility: 'Moderate' },
+        { name: 'Puncak Lawang', region: 'Western Highlands', accessibility: 'Challenging' },
+      ],
+    },
   },
 };
 
-// Komponen Tabel Modern
+// Modern Table Component
 function ModernTable({ columns, data }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -97,11 +120,11 @@ function ModernTable({ columns, data }) {
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const itemsPerPage = 10;
 
-  // Fungsionalitas pencarian
+  // Search functionality
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
     
-    return data.filter(row =>
+    return data.filter(row => 
       columns.some(col => {
         const value = row[col.key];
         return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase());
@@ -109,7 +132,7 @@ function ModernTable({ columns, data }) {
     );
   }, [data, searchTerm, columns]);
 
-  // Fungsionalitas pengurutan
+  // Sorting functionality
   const sortedData = useMemo(() => {
     if (!sortConfig.key) return filteredData;
 
@@ -123,7 +146,7 @@ function ModernTable({ columns, data }) {
     });
   }, [filteredData, sortConfig]);
 
-  // Paginasi
+  // Pagination
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return sortedData.slice(startIndex, startIndex + itemsPerPage);
@@ -147,41 +170,41 @@ function ModernTable({ columns, data }) {
 
   const goToPage = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-    setExpandedDescriptions({}); // Reset deskripsi yang diperluas saat berganti halaman
+    setExpandedDescriptions({}); // Reset expanded descriptions when changing page
   };
 
   return (
     <div className="space-y-4">
-      {/* Bilah Pencarian */}
+      {/* Search Bar */}
       <div className="relative">
         <input
           type="text"
-          placeholder="Cari kegiatan..."
+          placeholder="Search locations..."
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
-            setExpandedDescriptions({}); // Reset deskripsi yang diperluas saat mencari
+            setExpandedDescriptions({}); // Reset expanded descriptions when searching
           }}
           className="w-full px-4 py-3 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
         />
         <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
       </div>
 
-      {/* Kontainer Tabel */}
+      {/* Table Container */}
       <div className="bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gradient-to-r from-red-600 to-red-700">
                 {columns.map((col) => (
-                  <th
+                  <th 
                     key={col.key}
                     className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer hover:bg-red-800/50 transition-colors"
                     onClick={() => handleSort(col.key)}
                   >
                     <div className="flex items-center space-x-1">
-                      <span className={col.key === 'tempat' ? 'max-w-[200px] truncate' : ''}>
+                      <span className={col.key === 'deskripsi' ? 'max-w-[200px] truncate' : ''}>
                         {col.label}
                       </span>
                       {sortConfig.key === col.key && (
@@ -195,59 +218,62 @@ function ModernTable({ columns, data }) {
             <tbody className="divide-y divide-gray-700">
               {paginatedData.length > 0 ? (
                 paginatedData.map((row, idx) => (
-                  <tr
-                    key={idx}
+                  <tr 
+                    key={idx} 
                     className="hover:bg-gray-700/50 transition-all duration-200 hover:transform hover:scale-[1.01]"
                   >
                     {columns.map((col) => (
                       <td key={col.key} className="px-6 py-4 text-sm text-gray-300">
-                        {col.key === 'peta_sungai' && row.jalur_orad && row.point_orad ? (
-                          <Link
-                            href={`/activities/rafting/river-map?jalur=${row.jalur_orad}&point=${row.point_orad}&nama=${encodeURIComponent(row.nama_kegiatan)}&sungai=${encodeURIComponent(row.sungai || '')}`}
-                            className="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors"
-                          >
-                            <i className="fas fa-water mr-1 text-xs"></i>
-                            <span className="text-xs font-medium">Lihat Peta Sungai</span>
-                          </Link>
-                        ) : col.key === 'peta_pda' && row.jalur_pda && row.point_pda ? (
-                          <Link
-                            href={`/activities/diksar/pda-map?jalur=${row.jalur_pda}&point=${row.point_pda}&nama=${encodeURIComponent(row.nama_kegiatan)}`}
+                        {col.key === 'link_rop' && row[col.key] ? (
+                          <a 
+                            href={row[col.key]} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
                             className="inline-flex items-center px-3 py-1 bg-red-600/20 text-red-400 rounded-full hover:bg-red-600/30 transition-colors"
                           >
-                            <i className="fas fa-map-marked-alt mr-1 text-xs"></i>
-                            <span className="text-xs font-medium">Lihat Peta PDA</span>
-                          </Link>
-                        ) : col.key === 'link_rop' && row[col.key] ? (
-                          <a
-                            href={row[col.key]}
+                            <i className="fas fa-external-link-alt mr-1 text-xs"></i>
+                            <span className="text-xs font-medium">View</span>
+                          </a>
+                        ) : col.key === 'titik_koordinat' && row[col.key] ? (
+                          <a 
+                            href={`https://www.google.com/maps/search/?api=1&query=${row[col.key]}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1 bg-green-600/20 text-green-400 rounded-full hover:bg-green-600/30 transition-colors"
+                            className="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors"
                           >
-                            <i className="fas fa-external-link-alt mr-1 text-xs"></i>
-                            <span className="text-xs font-medium">ROP</span>
+                            <i className="fas fa-map-marker-alt mr-1 text-xs"></i>
+                            <span className="text-xs font-medium truncate max-w-[150px]">{row[col.key]}</span>
                           </a>
-                        ) : (col.key === 'tempat' || col.key === 'tanggal_kegiatan' || col.key === 'lokasi') && row[col.key] && row[col.key].length > 50 ? (
+                        ) : (col.key === 'lat' || col.key === 'long') && row.lat && row.long ? (
+                          col.key === 'lat' ? (
+                            <a 
+                              href={`https://www.google.com/maps/search/?api=1&query=${row.lat},${row.long}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full hover:bg-blue-600/30 transition-colors"
+                            >
+                              <i className="fas fa-globe mr-1 text-xs"></i>
+                              <span className="text-xs font-medium">{row[col.key]}</span>
+                            </a>
+                          ) : (
+                            <span className="text-xs">{row[col.key]}</span>
+                          )
+                        ) : col.key === 'deskripsi' && row[col.key] ? (
                           <div className="relative">
                             <div className={`${!expandedDescriptions[idx] ? 'max-w-[300px] truncate' : ''}`}>
                               {row[col.key]}
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleDescription(idx);
-                              }}
-                              className="text-blue-400 hover:text-blue-300 text-xs mt-1 underline transition-colors"
-                            >
-                              {expandedDescriptions[idx] ? 'Lihat lebih sedikit' : 'Lihat selengkapnya'}
-                            </button>
-                          </div>
-                        ) : col.key === 'sungai' ? (
-                          <div className="flex items-center">
-                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-600/20 text-blue-400">
-                              <i className="fas fa-water mr-1"></i>
-                              {row[col.key] || 'Tidak diketahui'}
-                            </div>
+                            {row[col.key].length > 50 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleDescription(idx);
+                                }}
+                                className="text-blue-400 hover:text-blue-300 text-xs mt-1 underline transition-colors"
+                              >
+                                {expandedDescriptions[idx] ? 'Lihat lebih sedikit' : 'Lihat selengkapnya'}
+                              </button>
+                            )}
                           </div>
                         ) : (
                           <span className={!row[col.key] ? 'text-gray-500 italic' : ''}>
@@ -263,7 +289,7 @@ function ModernTable({ columns, data }) {
                   <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-400">
                     <div className="flex flex-col items-center">
                       <i className="fas fa-search text-4xl mb-3 opacity-20"></i>
-                      <p>Tidak ada hasil ditemukan</p>
+                      <p>No results found</p>
                     </div>
                   </td>
                 </tr>
@@ -272,12 +298,12 @@ function ModernTable({ columns, data }) {
           </table>
         </div>
 
-        {/* Paginasi */}
+        {/* Pagination */}
         {totalPages > 1 && (
           <div className="bg-gray-900/50 px-6 py-4 border-t border-gray-700">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-sm text-gray-400">
-                Menampilkan {((currentPage - 1) * itemsPerPage) + 1} hingga {Math.min(currentPage * itemsPerPage, sortedData.length)} dari {sortedData.length} hasil
+                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, sortedData.length)} of {sortedData.length} results
               </p>
               
               <div className="flex items-center space-x-2">
@@ -315,8 +341,8 @@ function ModernTable({ columns, data }) {
                         key={idx}
                         onClick={() => goToPage(pageNum)}
                         className={`min-w-[40px] px-3 py-2 rounded-lg font-medium transition-all ${
-                          currentPage === pageNum
-                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                          currentPage === pageNum 
+                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                             : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
                         }`}
                       >
@@ -350,7 +376,7 @@ function ModernTable({ columns, data }) {
   );
 }
 
-export default function ActivityDetail({ type, astacalaData, externalData, issData, pdaData, oradData, divingData, paralayangData }) {
+export default function ActivityDetail({ type, astacalaData, externalData, issData }) {
   const router = useRouter();
   const [dataSource, setDataSource] = useState('astacala');
   
@@ -454,63 +480,6 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
     }
   }
 
-  // Create table data for rafting based on ORAD API data
-  if (type === 'rafting' && oradData && oradData.data && oradData.data.length > 0) {
-    activity.table = {
-      columns: [
-        { key: 'nama_kegiatan', label: 'Nama Kegiatan' },
-        { key: 'tanggal_kegiatan', label: 'Tanggal Kegiatan' },
-        { key: 'tempat', label: 'Tempat' },
-        { key: 'sungai', label: 'Sungai' },
-        { key: 'link_rop', label: 'ROP' },
-        { key: 'peta_sungai', label: 'Peta Sungai' },
-      ],
-      rows: oradData.data
-    };
-  }
-
-  // Create table data for diksar based on PDA API data
-  if (type === 'diksar' && pdaData && pdaData.data && pdaData.data.length > 0) {
-    activity.table = {
-      columns: [
-        { key: 'nama_kegiatan', label: 'Nama Kegiatan' },
-        { key: 'nama_angkatan', label: 'Nama Angkatan' },
-        { key: 'tanggal_kegiatan', label: 'Tanggal Kegiatan' },
-        { key: 'lokasi', label: 'Lokasi' },
-        { key: 'komandan_latihan', label: 'Komandan Latihan' },
-        { key: 'komandan_operasional', label: 'Komandan Operasional' },
-        { key: 'komandan_lapangan', label: 'Komandan Lapangan' },
-        { key: 'jumlah_panitia', label: 'Jumlah Panitia' },
-        { key: 'jumlah_siswa', label: 'Jumlah Siswa' },
-        { key: 'peta_pda', label: 'Peta PDA' },
-      ],
-      rows: pdaData.data
-    };
-  }
-
-  // Create table data for diving based on API data
-  if (type === 'diving' && divingData && divingData.data && divingData.data.length > 0) {
-    activity.table = {
-      columns: [
-        { key: 'lokasi', label: 'Nama Lokasi' },
-        { key: 'titik_koordinat', label: 'Koordinat' },
-      ],
-      rows: divingData.data
-    };
-  }
-
-  // Create table data for paralayang based on API data
-  if (type === 'paralayang' && paralayangData && paralayangData.data && paralayangData.data.length > 0) {
-    activity.table = {
-      columns: [
-        { key: 'nama_tempat', label: 'Nama Tempat' },
-        { key: 'lokasi', label: 'Lokasi' },
-        { key: 'titik_koordinat', label: 'Koordinat' },
-      ],
-      rows: paralayangData.data
-    };
-  }
-
   return (
     <>
       <Head>
@@ -532,8 +501,8 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
 
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-8 relative z-10">
           {/* Back Button */}
-          <Link
-            href="/activities"
+          <Link 
+            href="/activities" 
             className="inline-flex items-center text-gray-400 hover:text-white mb-4 transition-colors group"
           >
             <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -544,9 +513,9 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
 
           {/* Main Card - Responsive */}
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg flex flex-col lg:flex-row p-4 sm:p-6 gap-4 sm:gap-6 items-center mb-6 border border-gray-800 transform hover:shadow-red-900/20 transition-all duration-300">
-            <img
-              src={activity.image}
-              alt={activity.title}
+            <img 
+              src={activity.image} 
+              alt={activity.title} 
               className="w-full lg:w-48 h-48 lg:h-36 object-cover rounded-lg shadow-md"
               loading="lazy"
             />
@@ -563,7 +532,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 <div className="bg-red-600 text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-xl sm:text-2xl mb-2 transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <i className={f.icon}></i>
                 </div>
-                <Link
+                <Link 
                   href={`/activities/${type}/${f.label.toLowerCase().replace(/\s+/g, '-')}`}
                   className="font-semibold text-red-500 hover:text-red-400 text-center text-sm sm:text-base transition-colors"
                 >
@@ -578,33 +547,33 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
             <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 border border-gray-800">
               <h2 className="text-lg sm:text-xl font-bold mb-4 text-red-500">Sumber Data</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                <button
+                <button 
                   onClick={() => setDataSource('astacala')}
                   className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'astacala'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    dataSource === 'astacala' 
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
                   <i className="fas fa-mountain mr-2"></i>
                   Data Kegiatan Astacala
                 </button>
-                <button
+                <button 
                   onClick={() => setDataSource('external')}
                   className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'external'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    dataSource === 'external' 
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
                   <i className="fas fa-database mr-2"></i>
                   Data Klapanunggal
                 </button>
-                <button
+                <button 
                   onClick={() => setDataSource('iss')}
                   className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'iss'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    dataSource === 'iss' 
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
@@ -619,48 +588,35 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 border border-gray-800">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
               <h2 className="text-lg sm:text-xl font-bold text-red-500">
-                {type === 'caving'
+                {type === 'caving' 
                   ? (dataSource === 'astacala' ? 'Data Kegiatan Astacala' : dataSource === 'external' ? 'Data Klapanunggal' : 'Data Karst Umum (ISS)')
-                  : type === 'diksar'
-                  ? 'Data Kegiatan Pendidikan Dasar (PDA)'
-                  : type === 'rafting'
-                  ? 'Data Kegiatan Olahraga Arus Deras (ORAD)'
-                  : type === 'diving'
-                  ? 'Lokasi Diving'
-                  : type === 'paralayang'
-                  ? 'Lokasi Paralayang'
                   : 'Lokasi Kegiatan'
                 }
               </h2>
               {activity.table && activity.table.rows && (
                 <div className="flex items-center space-x-2">
-                  <i className={`fas ${type === 'diksar' ? 'fa-graduation-cap' : type === 'rafting' ? 'fa-water' : type === 'diving' ? 'fa-fish' : type === 'paralayang' ? 'fa-parachute-box' : 'fa-chart-bar'} text-red-500`}></i>
+                  <i className="fas fa-chart-bar text-red-500"></i>
                   <span className="text-sm text-gray-400">
-                    Total: {activity.table.rows.length} {type === 'diksar' ? 'kegiatan' : type === 'rafting' ? 'kegiatan ORAD' : 'lokasi'}
+                    Total: {activity.table.rows.length} lokasi
                   </span>
                 </div>
               )}
             </div>
             
-            {/* BAGIAN YANG DIPERBAIKI */}
             {activity.table && activity.table.rows ? (
-              <ModernTable
+              <ModernTable 
                 columns={activity.table.columns}
                 data={activity.table.rows}
               />
             ) : (
               <div className="text-center py-12">
                 <div className="text-5xl mb-4 opacity-20">
-                  <i className={`fas ${type === 'diksar' ? 'fa-graduation-cap' : type === 'rafting' ? 'fa-water' : type === 'diving' ? 'fa-fish' : type === 'paralayang' ? 'fa-parachute-box' : 'fa-map-marked-alt'}`}></i>
+                  <i className="fas fa-map-marked-alt"></i>
                 </div>
-                <p className="text-gray-400 text-lg">
-                  {type === 'diksar' ? 'Belum ada data kegiatan PDA' : type === 'rafting' ? 'Belum ada data kegiatan ORAD' : type === 'diving' ? 'Belum ada data lokasi diving' : type === 'paralayang' ? 'Belum ada data lokasi paralayang' : 'No location data available'}
-                </p>
+                <p className="text-gray-400 text-lg">No location data available</p>
                 <p className="text-gray-500 text-sm mt-2">Check back later for updates</p>
               </div>
             )}
-            {/* AKHIR BAGIAN YANG DIPERBAIKI */}
-            
           </div>
         </div>
 
@@ -705,7 +661,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
   );
 }
 
-
+// This function gets called at build time
 export async function getStaticPaths() {
   const paths = [
     { params: { type: 'rock-climbing' } },
@@ -713,28 +669,26 @@ export async function getStaticPaths() {
     { params: { type: 'rafting' } },
     { params: { type: 'diving' } },
     { params: { type: 'conservation' } },
-    { params: { type: 'paralayang' } },
-    { params: { type: 'diksar' } }
+    { params: { type: 'paralayang' } }
   ];
   
   return { paths, fallback: false };
 }
 
+// This function gets called at build time
 export async function getStaticProps({ params }) {
   const { type } = params;
   
   let astacalaData = null;
   let externalData = null;
   let issData = null;
-  let pdaData = null;
-  let oradData = null;
-  let divingData = null;
-  let paralayangData = null;
   
+  // Use the same baseURL as map.js
   const baseURL = 'http://52.64.175.183';
   
   if (type === 'rock-climbing') {
     try {
+      // Use the same endpoint as map.js for rock climbing
       const res = await fetch(`${baseURL}/items/rc_astacala?limit=-1`);
       astacalaData = await res.json();
     } catch (error) {
@@ -744,12 +698,15 @@ export async function getStaticProps({ params }) {
   
   if (type === 'caving') {
     try {
+      // Fetch Astacala cave data - same as map.js
       const astRes = await fetch(`${baseURL}/items/caving_astacala?limit=-1`);
       astacalaData = await astRes.json();
       
+      // Fetch Klapanunggal cave data - same as map.js
       const extRes = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
       externalData = await extRes.json();
       
+      // Fetch ISS cave data - same as map.js  
       const issRes = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
       issData = await issRes.json();
     } catch (error) {
@@ -757,66 +714,26 @@ export async function getStaticProps({ params }) {
     }
   }
   
-  if (type === 'rafting') {
-    try {
-      const oradRes = await fetch(`${baseURL}/items/orad_astacala?limit=-1`);
-      oradData = await oradRes.json();
-    } catch (error) {
-      console.error('Failed to fetch ORAD data:', error);
-    }
-  }
-  
-  if (type === 'diksar') {
-    try {
-      const pdaRes = await fetch(`${baseURL}/items/PendasAstacala?limit=-1`);
-      pdaData = await pdaRes.json();
-    } catch (error) {
-      console.error('Failed to fetch PDA data:', error);
-    }
-  }
-  
-  // Fetch diving data
-  if (type === 'diving') {
-    try {
-      const divingRes = await fetch(`${baseURL}/items/diving_astacala?limit=-1`);
-      divingData = await divingRes.json();
-    } catch (error) {
-      console.error('Failed to fetch diving data:', error);
-    }
-  }
-  
-  // Fetch paralayang data
-  if (type === 'paralayang') {
-    try {
-      const paralayangRes = await fetch(`${baseURL}/items/paralayang_astacala?limit=-1`);
-      paralayangData = await paralayangRes.json();
-    } catch (error) {
-      console.error('Failed to fetch paralayang data:', error);
-    }
-  }
-  
+  // Process data to reduce size - only send necessary fields
   const processData = (data) => {
     if (!data || !data.data) return null;
     return {
       ...data,
       data: data.data.map(item => {
+        // Remove unnecessary fields to reduce data size
         const { user_created, user_updated, date_created, date_updated, ...rest } = item;
         return rest;
       })
     };
   };
   
-  return {
-    props: {
+  return { 
+    props: { 
       type,
       astacalaData: processData(astacalaData),
       externalData: processData(externalData),
-      issData: processData(issData),
-      pdaData: processData(pdaData),
-      oradData: processData(oradData),
-      divingData: processData(divingData),
-      paralayangData: processData(paralayangData)
+      issData: processData(issData)
     },
-    revalidate: 3600,
+    revalidate: 3600, // Same as map.js - revalidate every hour
   };
 }
