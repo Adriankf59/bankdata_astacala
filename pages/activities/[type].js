@@ -100,7 +100,7 @@ function ModernTable({ columns, data }) {
   // Fungsionalitas pencarian
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
-    
+
     return data.filter(row =>
       columns.some(col => {
         const value = row[col.key];
@@ -116,7 +116,7 @@ function ModernTable({ columns, data }) {
     return [...filteredData].sort((a, b) => {
       const aValue = a[sortConfig.key] || '';
       const bValue = b[sortConfig.key] || '';
-      
+
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
@@ -279,7 +279,7 @@ function ModernTable({ columns, data }) {
               <p className="text-sm text-gray-400">
                 Menampilkan {((currentPage - 1) * itemsPerPage) + 1} hingga {Math.min(currentPage * itemsPerPage, sortedData.length)} dari {sortedData.length} hasil
               </p>
-              
+
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => goToPage(1)}
@@ -288,7 +288,7 @@ function ModernTable({ columns, data }) {
                 >
                   <i className="fas fa-angle-double-left"></i>
                 </button>
-                
+
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
@@ -296,7 +296,7 @@ function ModernTable({ columns, data }) {
                 >
                   <i className="fas fa-angle-left"></i>
                 </button>
-                
+
                 <div className="flex items-center space-x-1">
                   {[...Array(Math.min(5, totalPages))].map((_, idx) => {
                     let pageNum;
@@ -309,23 +309,22 @@ function ModernTable({ columns, data }) {
                     } else {
                       pageNum = currentPage - 2 + idx;
                     }
-                    
+
                     return (
                       <button
                         key={idx}
                         onClick={() => goToPage(pageNum)}
-                        className={`min-w-[40px] px-3 py-2 rounded-lg font-medium transition-all ${
-                          currentPage === pageNum
-                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                        }`}
+                        className={`min-w-[40px] px-3 py-2 rounded-lg font-medium transition-all ${currentPage === pageNum
+                          ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                          }`}
                       >
                         {pageNum}
                       </button>
                     );
                   })}
                 </div>
-                
+
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -333,7 +332,7 @@ function ModernTable({ columns, data }) {
                 >
                   <i className="fas fa-angle-right"></i>
                 </button>
-                
+
                 <button
                   onClick={() => goToPage(totalPages)}
                   disabled={currentPage === totalPages}
@@ -353,7 +352,7 @@ function ModernTable({ columns, data }) {
 export default function ActivityDetail({ type, astacalaData, externalData, issData, pdaData, oradData, divingData, paralayangData }) {
   const router = useRouter();
   const [dataSource, setDataSource] = useState('astacala');
-  
+
   // Handle fallback
   if (router.isFallback) {
     return (
@@ -386,19 +385,19 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
   // Create table data for rock climbing based on API data
   if (type === 'rock-climbing' && astacalaData && astacalaData.data && astacalaData.data.length > 0) {
     const firstItem = astacalaData.data[0];
-    
+
     const columns = Object.keys(firstItem)
       .filter(key => key !== 'id' && key !== 'no')
       .map(key => {
         let label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        
+
         if (key === 'nama_lokasi') label = 'Nama Lokasi';
         if (key === 'titik_koordinat') label = 'Koordinat';
         if (key === 'link_rop') label = 'ROP Link';
-        
+
         return { key, label };
       });
-    
+
     activity.table = {
       columns,
       rows: astacalaData.data
@@ -580,33 +579,30 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <button
                   onClick={() => setDataSource('astacala')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'astacala'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
-                  }`}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${dataSource === 'astacala'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                    }`}
                 >
                   <i className="fas fa-mountain mr-2"></i>
                   Data Kegiatan Astacala
                 </button>
                 <button
                   onClick={() => setDataSource('external')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'external'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
-                  }`}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${dataSource === 'external'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                    }`}
                 >
                   <i className="fas fa-database mr-2"></i>
                   Data Klapanunggal
                 </button>
                 <button
                   onClick={() => setDataSource('iss')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    dataSource === 'iss'
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
-                  }`}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${dataSource === 'iss'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                    }`}
                 >
                   <i className="fas fa-globe mr-2"></i>
                   Data Karst Umum (ISS)
@@ -622,14 +618,14 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 {type === 'caving'
                   ? (dataSource === 'astacala' ? 'Data Kegiatan Astacala' : dataSource === 'external' ? 'Data Klapanunggal' : 'Data Karst Umum (ISS)')
                   : type === 'diksar'
-                  ? 'Data Kegiatan Pendidikan Dasar (PDA)'
-                  : type === 'rafting'
-                  ? 'Data Kegiatan Olahraga Arus Deras (ORAD)'
-                  : type === 'diving'
-                  ? 'Lokasi Diving'
-                  : type === 'paralayang'
-                  ? 'Lokasi Paralayang'
-                  : 'Lokasi Kegiatan'
+                    ? 'Data Kegiatan Pendidikan Dasar (PDA)'
+                    : type === 'rafting'
+                      ? 'Data Kegiatan Olahraga Arus Deras (ORAD)'
+                      : type === 'diving'
+                        ? 'Lokasi Diving'
+                        : type === 'paralayang'
+                          ? 'Lokasi Paralayang'
+                          : 'Lokasi Kegiatan'
                 }
               </h2>
               {activity.table && activity.table.rows && (
@@ -641,7 +637,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
                 </div>
               )}
             </div>
-            
+
             {/* BAGIAN YANG DIPERBAIKI */}
             {activity.table && activity.table.rows ? (
               <ModernTable
@@ -660,7 +656,7 @@ export default function ActivityDetail({ type, astacalaData, externalData, issDa
               </div>
             )}
             {/* AKHIR BAGIAN YANG DIPERBAIKI */}
-            
+
           </div>
         </div>
 
@@ -716,13 +712,13 @@ export async function getStaticPaths() {
     { params: { type: 'paralayang' } },
     { params: { type: 'diksar' } }
   ];
-  
+
   return { paths, fallback: false };
 }
 
 export async function getStaticProps({ params }) {
   const { type } = params;
-  
+
   let astacalaData = null;
   let externalData = null;
   let issData = null;
@@ -730,71 +726,64 @@ export async function getStaticProps({ params }) {
   let oradData = null;
   let divingData = null;
   let paralayangData = null;
-  
+
   const baseURL = 'http://52.64.175.183';
-  
-  if (type === 'rock-climbing') {
+
+  // Helper function to safely fetch JSON data with timeout
+  const safeFetch = async (url) => {
     try {
-      const res = await fetch(`${baseURL}/items/rc_astacala?limit=-1`);
-      astacalaData = await res.json();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        console.error(`Failed to fetch ${url}: HTTP ${res.status}`);
+        return null;
+      }
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error(`Invalid content-type for ${url}: ${contentType}`);
+        return null;
+      }
+      return await res.json();
     } catch (error) {
-      console.error('Failed to fetch rock climbing data:', error);
+      if (error.name === 'AbortError') {
+        console.error(`Fetch timeout for ${url}`);
+      } else {
+        console.error(`Failed to fetch ${url}:`, error.message);
+      }
+      return null;
     }
-  }
-  
+  };
+
+  // Rock climbing endpoint is not available, skip fetching
+
   if (type === 'caving') {
-    try {
-      const astRes = await fetch(`${baseURL}/items/caving_astacala?limit=-1`);
-      astacalaData = await astRes.json();
-      
-      const extRes = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
-      externalData = await extRes.json();
-      
-      const issRes = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
-      issData = await issRes.json();
-    } catch (error) {
-      console.error('Failed to fetch caving data:', error);
-    }
+    astacalaData = await safeFetch(`${baseURL}/items/caving_astacala?limit=-1`);
+    externalData = await safeFetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
+    issData = await safeFetch(`${baseURL}/items/caving_data_iss?limit=-1`);
   }
-  
+
   if (type === 'rafting') {
-    try {
-      const oradRes = await fetch(`${baseURL}/items/orad_astacala?limit=-1`);
-      oradData = await oradRes.json();
-    } catch (error) {
-      console.error('Failed to fetch ORAD data:', error);
-    }
+    oradData = await safeFetch(`${baseURL}/items/orad_astacala?limit=-1`);
   }
-  
+
   if (type === 'diksar') {
-    try {
-      const pdaRes = await fetch(`${baseURL}/items/PendasAstacala?limit=-1`);
-      pdaData = await pdaRes.json();
-    } catch (error) {
-      console.error('Failed to fetch PDA data:', error);
-    }
+    pdaData = await safeFetch(`${baseURL}/items/PendasAstacala?limit=-1`);
   }
-  
+
   // Fetch diving data
   if (type === 'diving') {
-    try {
-      const divingRes = await fetch(`${baseURL}/items/diving_astacala?limit=-1`);
-      divingData = await divingRes.json();
-    } catch (error) {
-      console.error('Failed to fetch diving data:', error);
-    }
+    divingData = await safeFetch(`${baseURL}/items/diving_astacala?limit=-1`);
   }
-  
+
   // Fetch paralayang data
   if (type === 'paralayang') {
-    try {
-      const paralayangRes = await fetch(`${baseURL}/items/paralayang_astacala?limit=-1`);
-      paralayangData = await paralayangRes.json();
-    } catch (error) {
-      console.error('Failed to fetch paralayang data:', error);
-    }
+    paralayangData = await safeFetch(`${baseURL}/items/paralayang_astacala?limit=-1`);
   }
-  
+
   const processData = (data) => {
     if (!data || !data.data) return null;
     return {
@@ -805,7 +794,7 @@ export async function getStaticProps({ params }) {
       })
     };
   };
-  
+
   return {
     props: {
       type,

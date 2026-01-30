@@ -145,202 +145,32 @@ const parseDMSCoordinates = (coordString) => {
 // Fetch data at build time
 export async function getStaticProps() {
   try {
-    const baseURL = 'http://52.64.175.183';
-    
-    // Fetch all data with error handling
-    console.log('Fetching data from Directus...');
-    
-    // Fetch ISS cave data (data karst umum)
-    const issDataResponse = await fetch(`${baseURL}/items/caving_data_iss?limit=-1`);
-    const issDataRaw = await issDataResponse.json();
-    console.log('ISS Data Response:', issDataRaw);
-    
-    // Fetch Astacala cave data
-    const cavingAstResponse = await fetch(`${baseURL}/items/caving_astacala?limit=-1`);
-    const cavingAstData = await cavingAstResponse.json();
-    console.log('Caving Astacala Response:', cavingAstData);
-    
-    // Fetch Klapanunggal cave data
-    const cavingKlapanunggalResponse = await fetch(`${baseURL}/items/caving_klapanunggal?limit=-1`);
-    const cavingKlapanunggalData = await cavingKlapanunggalResponse.json();
-    console.log('Caving Klapanunggal Response:', cavingKlapanunggalData);
-    
-    // Fetch rock climbing data
-    const rockClimbingResponse = await fetch(`${baseURL}/items/rc_astacala?limit=-1`);
-    const rockClimbingData = await rockClimbingResponse.json();
-    console.log('Rock Climbing Response:', rockClimbingData);
-    
-    // Fetch diving data
-    const divingResponse = await fetch(`${baseURL}/items/diving_astacala?limit=-1`);
-    const divingData = await divingResponse.json();
-    console.log('Diving Response:', divingData);
-    
-    // Fetch paralayang data
-    const paralayangResponse = await fetch(`${baseURL}/items/paralayang_astacala?limit=-1`);
-    const paralayangData = await paralayangResponse.json();
-    console.log('Paralayang Response:', paralayangData);
-    
-    // Transform ISS data (handle string format)
-    const issDataPoints = (issDataRaw.data || []).map(cave => {
-      // Parse lat/long dari string ke number
-      const lat = typeof cave.lat === 'string' ? parseFloat(cave.lat) : cave.lat;
-      const long = typeof cave.long === 'string' ? parseFloat(cave.long) : cave.long;
-      
-      // Validasi lat dan long
-      if (!cave.lat || !cave.long || isNaN(lat) || isNaN(long)) {
-        console.error(`Invalid coordinates for ${cave.nama_potensi_karst}:`, cave.lat, cave.long);
-        return null;
-      }
-      
-      return {
-        name: cave.nama_potensi_karst,
-        description: cave.deskripsi || 'Tidak ada deskripsi',
-        coordinates: [long, lat], // Format [longitude, latitude]
-        division: 'caving',
-        id: cave.id,
-        source: 'iss_data',
-        // Store ISS data properties
-        sumberData: cave.sumber_data || null,
-        jenisPotensiKarst: cave.jenis_potensi_karst || null,
-        typeGua: cave.type_gua || null,
-        statusPemetaanGua: cave.status_pemetaan_gua || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform Astacala cave data (format DMS)
-    const cavingAstPoints = (cavingAstData.data || []).map(cave => {
-      const coordinates = parseDMSCoordinates(cave.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: cave.nama_gua,
-        description: cave.deskripsi || 'Tidak ada deskripsi',
-        coordinates: coordinates,
-        division: 'caving',
-        id: cave.id,
-        source: 'astacala',
-        // Store Astacala cave data properties
-        kegiatan: cave.kegiatan || null,
-        kota: cave.kota || null,
-        provinsi: cave.provinsi || null,
-        kedalaman: cave.kedalaman || null,
-        karakterLorong: cave.karakter_lorong || null,
-        waktuKegiatan: cave.waktu_kegiatan || null,
-        linkRop: cave.link_rop || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform Klapanunggal cave data (format decimal degrees)
-    const cavingKlapanunggalPoints = (cavingKlapanunggalData.data || []).map(cave => {
-      const coordinates = parseCoordinates(cave.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: cave.nama_gua,
-        description: `${cave.sinonim ? `Sinonim: ${cave.sinonim}<br>` : ''}Elevasi: ${cave.elevasi_mulut_gua || 'N/A'} m<br>Status: ${cave.status_explore || 'N/A'}`,
-        coordinates: coordinates,
-        division: 'caving',
-        id: cave.id,
-        source: 'external',
-        // Store Klapanunggal cave data properties
-        karakterLorong: cave.karakter_lorong || null,
-        totalKedalaman: cave.total_kedalaman || null,
-        totalPanjang: cave.total_panjang || null,
-        elevasiMulutGua: cave.elevasi_mulut_gua || null,
-        statusExplore: cave.status_explore || null,
-        sinonim: cave.sinonim || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform rock climbing data (format decimal dengan koma)
-    const rockClimbingPoints = (rockClimbingData.data || []).map(rc => {
-      const coordinates = parseCoordinates(rc.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: rc.nama_lokasi,
-        description: rc.deskripsi || 'Tidak ada deskripsi',
-        coordinates: coordinates,
-        division: 'panjatTebing',
-        id: rc.id,
-        source: 'astacala',
-        // Store rock climbing data properties
-        kegiatan: rc.kegiatan || null,
-        kota: rc.kota || null,
-        provinsi: rc.provinsi || null,
-        ketinggian: rc.ketinggian || null,
-        waktuKegiatan: rc.waktu_kegiatan || null,
-        linkRop: rc.link_rop || null
-      };
-    }).filter(item => item !== null);
-    
-    // Transform diving data (format decimal dengan koma)
-    const divingPoints = (divingData.data || []).map(dive => {
-      const coordinates = parseCoordinates(dive.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: dive.lokasi,
-        description: 'Lokasi diving',
-        coordinates: coordinates,
-        division: 'diving',
-        id: dive.id,
-        source: 'astacala'
-      };
-    }).filter(item => item !== null);
-    
-    // Transform paralayang data (format decimal dengan koma)
-    const paralayangPoints = (paralayangData.data || []).map(para => {
-      const coordinates = parseCoordinates(para.titik_koordinat);
-      
-      if (!coordinates) return null;
-      
-      return {
-        name: para.nama_tempat,
-        description: para.lokasi || 'Lokasi paralayang',
-        coordinates: coordinates,
-        division: 'paralayang',
-        id: para.id,
-        source: 'astacala',
-        lokasi: para.lokasi || null
-      };
-    }).filter(item => item !== null);
-    
-    // Combine all caving data
-    const allCavingData = [
-      ...issDataPoints,
-      ...cavingAstPoints,
-      ...cavingKlapanunggalPoints
-    ];
-    
-    console.log(`Loaded data: 
-      - ISS Data: ${issDataPoints.length} points
-      - Caving Astacala: ${cavingAstPoints.length} points
-      - Caving Klapanunggal: ${cavingKlapanunggalPoints.length} points
-      - Rock Climbing: ${rockClimbingPoints.length} points
-      - Diving: ${divingPoints.length} points
-      - Paralayang: ${paralayangPoints.length} points
-      - Total Caving: ${allCavingData.length} points
-    `);
-    
+    // Import API functions
+    const { fetchCavesGeoJSON, transformCaveFeatures } = await import('../lib/api/caves');
+
+    console.log('Fetching caves data from Bank Data API...');
+
+    // Fetch caves data from new API
+    const cavesGeoJSON = await fetchCavesGeoJSON();
+    const cavingData = transformCaveFeatures(cavesGeoJSON);
+
+    console.log(`Loaded ${cavingData.length} cave points from Bank Data API`);
+
     return {
       props: {
-        cavingData: allCavingData,  // All caving data combined
-        cavingAstPoints: cavingAstPoints,  // Keep separate for filtering
-        rockClimbingPoints: rockClimbingPoints,
-        issDataPoints: issDataPoints,  // Keep separate for filtering
-        divingPoints: divingPoints,
-        paralayangPoints: paralayangPoints
+        cavingData,
+        // Other props set to empty arrays for backward compatibility
+        cavingAstPoints: [],
+        rockClimbingPoints: [],
+        issDataPoints: [],
+        divingPoints: [],
+        paralayangPoints: []
       },
       // Re-generate the page at most once per hour
       revalidate: 3600
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error fetching caves data:", error);
     // Return empty data if fetch fails
     return {
       props: {
@@ -411,14 +241,19 @@ export default function MapPage({ cavingData, cavingAstPoints, rockClimbingPoint
           
           /* Custom popup styling - responsive */
           .maplibregl-popup-content {
-            background-color: #1a1a1a !important;
-            padding: clamp(8px, 2vw, 12px) !important;
-            border: 1px solid #ff3333 !important;
-            border-radius: 4px !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+            background-color: transparent !important;
+            background: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             color: white !important;
-            max-width: min(90vw, 300px) !important;
+            max-width: min(90vw, 380px) !important;
             font-size: clamp(12px, 3vw, 14px) !important;
+          }
+
+          .maplibregl-popup {
+            max-width: min(90vw, 380px) !important;
           }
           
           .maplibregl-popup-close-button {
